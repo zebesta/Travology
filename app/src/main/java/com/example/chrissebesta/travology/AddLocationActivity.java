@@ -38,7 +38,7 @@ public class AddLocationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(getApplicationContext(), AddLocationActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                 intent.putExtra(LAT_TAG, mLat);
                 intent.putExtra(LONG_TAG, mLong);
                 startActivity(intent);
