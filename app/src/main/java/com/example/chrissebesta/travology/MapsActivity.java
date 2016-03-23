@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    public final String GEO_MAPS_DATA_TAG = "GEOTAGIT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
