@@ -22,8 +22,8 @@ public class AddLocationActivity extends AppCompatActivity {
     private Button mGeoButton;
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
-    private double mLat;
-    private double mLong;
+    private long mLat;
+    private long mLong;
 
 
 
@@ -79,7 +79,7 @@ public class AddLocationActivity extends AppCompatActivity {
         Address ad = mAddresses.get(0);
         Log.d("ADDRESSES", "Country: " + ad.getCountryName() + " Lat: " + ad.getLatitude() + " Long: " + ad.getLongitude());
 
-        mLat = ad.getLatitude();
-        mLong = ad.getLongitude();
+        mLat = (long) ad.getLatitude();
+        mLong = (long) ad.getLongitude();
     }
 }

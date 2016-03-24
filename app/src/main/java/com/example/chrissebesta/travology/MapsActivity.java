@@ -13,7 +13,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -67,25 +66,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions()
+//                .position(sydney)
+//                .title("Marker in Sydney")
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps)));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//
+//
+//        // You can customize the marker image using images bundled with
+//        // your app, or dynamically generated bitmaps.
+//        mMap.addMarker(new MarkerOptions()
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+//                .title("Extra example marker")
+//                .position(new LatLng(-33.0685378, 151.441359)));
+
+        LatLng addedLocation = new LatLng(mLat, mLong);
         mMap.addMarker(new MarkerOptions()
-                .position(sydney)
-                .title("Marker in Sydney")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+                .title("TEST GEO Marker")
+                .position(addedLocation));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(addedLocation));
 
 
-        // You can customize the marker image using images bundled with
-        // your app, or dynamically generated bitmaps.
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-                .title("Extra example marker")
-                .position(new LatLng(-33.0685378, 151.441359)));
 
-        mMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-                .title("Extra example marker")
-                .position(new LatLng(mLat, mLong)));
+//        Intent intent = getIntent();
+//        mLat = intent.getLongExtra(LAT_TAG, 75);
+//        mLong = intent.getLongExtra(LONG_TAG, 75);
+//        mMap.addMarker(new MarkerOptions()
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+//                .title("Extra example marker")
+//                .position(new LatLng(mLat, mLong)));
     }
 
     @Override
