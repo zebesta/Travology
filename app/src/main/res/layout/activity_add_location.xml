@@ -18,13 +18,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="Location:"/>
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+        <AutoCompleteTextView
             android:id="@+id/add_location_entry_text"
-            android:layout_weight="1"
-            android:hint="i.e. Austin, TX"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:hint="@string/autocomplete_hint"
+            android:singleLine="true" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,6 +42,27 @@
         android:text="TEST GEO BUTTON"
         android:id="@+id/geo_button"
         />
+    <Button
+        android:id="@+id/button_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/clear_text" />
+
+    <TextView
+        android:id="@+id/place_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoLink="all"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <TextView
+        android:id="@+id/place_attribution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoLink="all"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 
 </LinearLayout>
