@@ -1,5 +1,6 @@
 package com.example.chrissebesta.travology;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Address;
@@ -27,6 +28,7 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AddLocationActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -43,10 +45,15 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
     private List<Address> mAddresses;
     private Button mGeoButton;
+    private Button mAddLocButton;
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
+    private LatLng mLLToAdd;
     private long mLat;
     private long mLong;
+    // Array list to store all added lat long coordinates
+    ArrayList<LatLng> coordinates = new ArrayList<>();
+
 
 
 
@@ -73,12 +80,36 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
         mPlaceDetailsAttribution = (TextView) findViewById(R.id.place_attribution);
 
+
+
+        mAddLocButton = (Button) findViewById(R.id.add_loc_button);
+        mAddLocButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //Show that the coords are being added
+                Context context = getApplicationContext();
+                CharSequence text = "The coordinates are: "+mLLToAdd;
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                Log.d("ADD_LOC", "You're adding location!");
+
+                //add coordinates to the bundle
+                coordinates.add(mLLToAdd);
+            }
+        });
         mGeoButton = (Button) findViewById(R.id.geo_button);
         mGeoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("coordinates", coordinates);
+                intent.putExtras(bundle);
+                Log.d(LOG_TAG, "first coordinate is: "+coordinates.get(0));
+
                 intent.putExtra(LAT_TAG, mLat);
                 intent.putExtra(LONG_TAG, mLong);
                 startActivity(intent);
@@ -207,6 +238,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             final Place place = places.get(0);
 
             LatLng placeLatLng = place.getLatLng();
+            //add Lat Long for clicked item to
+            mLLToAdd = placeLatLng;
             String ll = placeLatLng.toString();
             Log.d("LATLONG", "Lat and long are: " + ll);
             mLat = (long) placeLatLng.latitude;

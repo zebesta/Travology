@@ -39,6 +39,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"
+        android:text="ADD LOCATION"
+        android:id="@+id/add_loc_button"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
         android:text="TEST GEO BUTTON"
         android:id="@+id/geo_button"
         />

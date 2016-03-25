@@ -16,6 +16,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -23,6 +25,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public final String LONG_TAG = "LONG TAG IT";
     private double mLat;
     private double mLong;
+    private ArrayList<LatLng> mCoordinates;
     ;
     public final String GEO_MAPS_DATA_TAG = "GEOTAGIT";
     /**
@@ -36,10 +39,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
+        mCoordinates = getIntent().getParcelableArrayListExtra("coordinates");
+
         mLat = intent.getLongExtra(LAT_TAG, 0);
         mLong = intent.getLongExtra(LONG_TAG, 0);
 
         Log.d("EXTRA", "Got extras and they are: LAT: "+mLat+" LONG: "+mLong);
+        Log.d("EXTRA", "The array received has a size of: "+mCoordinates.size());
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -81,12 +87,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                .title("Extra example marker")
 //                .position(new LatLng(-33.0685378, 151.441359)));
 
-        LatLng addedLocation = new LatLng(mLat, mLong);
-        mMap.addMarker(new MarkerOptions()
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-                .title("TEST GEO Marker")
-                .position(addedLocation));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(addedLocation));
+//        LatLng addedLocation = new LatLng(mLat, mLong);
+//        mMap.addMarker(new MarkerOptions()
+//                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+//                .title("TEST GEO Marker")
+//                .position(addedLocation));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(addedLocation));
+
+        int numberOfLocs = mCoordinates.size();
+        for (int i =0;i<numberOfLocs;i++){
+            mMap.addMarker(new MarkerOptions()
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+                    .title("Marker number: "+i)
+                    .position(mCoordinates.get(i)));
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(mCoordinates.get(mCoordinates.size()-1)));
 
 
 
