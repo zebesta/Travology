@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +38,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     private PlaceAutocompleteAdapter mAdapter;
     protected GoogleApiClient mGoogleApiClient;
     private TextView mPlaceDetailsText;
-
+    private ListView mPlaceListView;
     private TextView mPlaceDetailsAttribution;
 
     public final String LOG_TAG = this.getClass().getSimpleName();
@@ -49,12 +50,13 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
     private LatLng mLLToAdd;
+    private Place mPlaceToAdd;
     private long mLat;
     private long mLong;
     // Array list to store all added lat long coordinates
     ArrayList<LatLng> coordinates = new ArrayList<>();
-
-
+    ArrayList<Place> mPlaces = new ArrayList<>();
+    ArrayList<String> mPlaceNames = new ArrayList<>();
 
 
     @Override
@@ -79,16 +81,16 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         // Retrieve the TextViews that will display details and attributions of the selected place.
         mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
         mPlaceDetailsAttribution = (TextView) findViewById(R.id.place_attribution);
-
+        mPlaceListView = (ListView) findViewById(R.id.location_list);
 
 
         mAddLocButton = (Button) findViewById(R.id.add_loc_button);
-        mAddLocButton.setOnClickListener(new View.OnClickListener(){
+        mAddLocButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Show that the coords are being added
                 Context context = getApplicationContext();
-                CharSequence text = "The coordinates are: "+mLLToAdd;
+                CharSequence text = "The coordinates are: " + mLLToAdd;
                 int duration = Toast.LENGTH_SHORT;
 
                 Toast toast = Toast.makeText(context, text, duration);
@@ -97,6 +99,19 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
                 //add coordinates to the bundle
                 coordinates.add(mLLToAdd);
+
+                //add place to array list of places
+                mPlaces.add(mPlaceToAdd);
+                Log.d("PLACE", "There are " + mPlaces.size() + " items in the places array");
+                for(int j = 0; j<coordinates.size(); j++){
+//                    Place testPlace = mPlaces.get(j);
+                    Log.d("PLACE", "The places in the list so far are: " + coordinates.get(j).toString());
+                    Log.d("PLACE", "The places in the list so far are: " + mPlaceNames.get(j));
+                }
+
+//                PlacesAddedAdapter adapter = new PlacesAddedAdapter(getBaseContext(), mPlaces);
+//                mPlaceListView.setAdapter(adapter);
+
             }
         });
         mGeoButton = (Button) findViewById(R.id.geo_button);
@@ -107,8 +122,10 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("coordinates", coordinates);
+                //bundle.putParcelableArrayList("places", places);
                 intent.putExtras(bundle);
-                Log.d(LOG_TAG, "first coordinate is: "+coordinates.get(0));
+                Log.d(LOG_TAG, "first coordinate is: " + coordinates.get(0));
+                //Log.d(LOG_TAG, "The first place is: "+places.get(0).getName());
 
                 intent.putExtra(LAT_TAG, mLat);
                 intent.putExtra(LONG_TAG, mLong);
@@ -125,6 +142,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
         // Set up the 'clear text' button that clears the text in the autocomplete view
         Button clearButton = (Button) findViewById(R.id.button_clear);
+        assert clearButton != null;
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,41 +152,6 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
     }
 
-//    private void buttonListener() {
-//        mEnterButton = (Button) findViewById(R.id.add_location_enter_button);
-//
-//        mEnterButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Context context = getApplicationContext();
-//                mLocationText = (AutoCompleteTextView) findViewById(R.id.add_location_entry_text);
-//                String text = String.valueOf(mLocationText.getText());
-//
-//                //text = "No text entered yet!";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, text, duration);
-//                toast.show();
-//
-//                try {
-//                    getCoordsFromEntry(text);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        });
-//    }
-
-//    private void getCoordsFromEntry(String text) throws IOException {
-//        Geocoder gc = new Geocoder(this);
-//        mAddresses = gc.getFromLocationName(text, 1);
-//        Address ad = mAddresses.get(0);
-//        Log.d("ADDRESSES", "Country: " + ad.getCountryName() + " Lat: " + ad.getLatitude() + " Long: " + ad.getLongitude());
-//
-//        mLat = (long) ad.getLatitude();
-//        mLong = (long) ad.getLongitude();
-//    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -240,6 +223,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             LatLng placeLatLng = place.getLatLng();
             //add Lat Long for clicked item to
             mLLToAdd = placeLatLng;
+            mPlaceToAdd = places.get(0);
+            mPlaceNames.add((String) place.getName());
             String ll = placeLatLng.toString();
             Log.d("LATLONG", "Lat and long are: " + ll);
             mLat = (long) placeLatLng.latitude;
