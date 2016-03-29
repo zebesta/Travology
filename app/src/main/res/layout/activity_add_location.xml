@@ -32,52 +32,62 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/add_loc_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="ADD LOCATION" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/geo_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="TEST GEO BUTTON" />
-
-    <Button
-        android:id="@+id/button_clear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/clear_text" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ListView
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/add_loc_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/location_list"></ListView>
-    </ScrollView>
+            android:layout_weight="0"
+            android:text="ADD LOCATION" />
 
-    <TextView
-        android:id="@+id/place_details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoLink="all"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        <Button
+            android:id="@+id/geo_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="TEST GEO BUTTON" />
 
-    <TextView
-        android:id="@+id/place_attribution"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoLink="all"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        <Button
+            android:id="@+id/button_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/clear_text" />
+
+        <Button
+            android:id="@+id/button_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/List" />
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/location_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/place_details"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:autoLink="all"-->
+        <!--android:text=""-->
+        <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/place_attribution"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:autoLink="all"-->
+        <!--android:text=""-->
+        <!--android:textAppearance="?android:attr/textAppearanceSmall" />-->
 
 
 </LinearLayout>

@@ -40,6 +40,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     private TextView mPlaceDetailsText;
     private ListView mPlaceListView;
     private TextView mPlaceDetailsAttribution;
+    private Geodata mGeodata;
+    private ArrayList<Geodata> mGeodataList = new ArrayList<>();
+    //private GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
 
     public final String LOG_TAG = this.getClass().getSimpleName();
 
@@ -47,6 +50,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     private List<Address> mAddresses;
     private Button mGeoButton;
     private Button mAddLocButton;
+    private Button mListButton;
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
     private LatLng mLLToAdd;
@@ -79,9 +83,11 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
         mLocationText.setOnItemClickListener(mAutocompleteClickListener);
         // Retrieve the TextViews that will display details and attributions of the selected place.
-        mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
-        mPlaceDetailsAttribution = (TextView) findViewById(R.id.place_attribution);
+        //mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
+        //mPlaceDetailsAttribution = (TextView) findViewById(R.id.place_attribution);
         mPlaceListView = (ListView) findViewById(R.id.location_list);
+        GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
+        mPlaceListView.setAdapter(mGeodataAdapter);
 
 
         mAddLocButton = (Button) findViewById(R.id.add_loc_button);
@@ -99,19 +105,18 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
                 //add coordinates to the bundle
                 coordinates.add(mLLToAdd);
+                if(mGeodata != null) {
+                    mGeodataList.add(mGeodata);
+                }
 
                 //add place to array list of places
                 mPlaces.add(mPlaceToAdd);
                 Log.d("PLACE", "There are " + mPlaces.size() + " items in the places array");
                 for(int j = 0; j<coordinates.size(); j++){
 //                    Place testPlace = mPlaces.get(j);
-                    Log.d("PLACE", "The places in the list so far are: " + coordinates.get(j).toString());
-                    Log.d("PLACE", "The places in the list so far are: " + mPlaceNames.get(j));
+//                    Log.d("PLACE", "The places in the list so far are: " + coordinates.get(j).toString());
+//                    Log.d("PLACE", "The places in the list so far are: " + mPlaceNames.get(j));
                 }
-
-//                PlacesAddedAdapter adapter = new PlacesAddedAdapter(getBaseContext(), mPlaces);
-//                mPlaceListView.setAdapter(adapter);
-
             }
         });
         mGeoButton = (Button) findViewById(R.id.geo_button);
@@ -129,6 +134,19 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
                 intent.putExtra(LAT_TAG, mLat);
                 intent.putExtra(LONG_TAG, mLong);
+                startActivity(intent);
+            }
+        });
+
+        mListButton = (Button) findViewById(R.id.button_list);
+        mListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), GeoListActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("coordinates", coordinates);
+                intent.putExtras(bundle);
+
                 startActivity(intent);
             }
         });
@@ -223,7 +241,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             LatLng placeLatLng = place.getLatLng();
             //add Lat Long for clicked item to
             mLLToAdd = placeLatLng;
-            mPlaceToAdd = places.get(0);
+            mPlaceToAdd = place;
+            mGeodata = new Geodata((String) place.getName(), place.getLatLng());
             mPlaceNames.add((String) place.getName());
             String ll = placeLatLng.toString();
             Log.d("LATLONG", "Lat and long are: " + ll);
@@ -231,18 +250,18 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             mLong = (long) placeLatLng.longitude;
 
             // Format details of the place for display and show it in a TextView.
-            mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-                    place.getId(), place.getAddress(), place.getPhoneNumber(),
-                    place.getWebsiteUri()));
+//            mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
+//                    place.getId(), place.getAddress(), place.getPhoneNumber(),
+//                    place.getWebsiteUri()));
 
             // Display the third party attributions if set.
             final CharSequence thirdPartyAttribution = places.getAttributions();
-            if (thirdPartyAttribution == null) {
-                mPlaceDetailsAttribution.setVisibility(View.GONE);
-            } else {
-                mPlaceDetailsAttribution.setVisibility(View.VISIBLE);
-                mPlaceDetailsAttribution.setText(Html.fromHtml(thirdPartyAttribution.toString()));
-            }
+//            if (thirdPartyAttribution == null) {
+//                mPlaceDetailsAttribution.setVisibility(View.GONE);
+//            } else {
+//                mPlaceDetailsAttribution.setVisibility(View.VISIBLE);
+//                mPlaceDetailsAttribution.setText(Html.fromHtml(thirdPartyAttribution.toString()));
+//            }
 
             Log.i(LOG_TAG, "Place details received: " + place.getName());
 
