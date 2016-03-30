@@ -1,21 +1,15 @@
 package com.example.chrissebesta.travology;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.location.Address;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,12 +31,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     private AutoCompleteTextView mLocationText;
     private PlaceAutocompleteAdapter mAdapter;
     protected GoogleApiClient mGoogleApiClient;
-    private TextView mPlaceDetailsText;
     private ListView mPlaceListView;
-    private TextView mPlaceDetailsAttribution;
     private Geodata mGeodata;
     private ArrayList<Geodata> mGeodataList = new ArrayList<>();
-    //private GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
 
     public final String LOG_TAG = this.getClass().getSimpleName();
 
@@ -82,11 +73,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         mLocationText = (AutoCompleteTextView) findViewById(R.id.add_location_entry_text);
 
         mLocationText.setOnItemClickListener(mAutocompleteClickListener);
-        // Retrieve the TextViews that will display details and attributions of the selected place.
-        //mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
-        //mPlaceDetailsAttribution = (TextView) findViewById(R.id.place_attribution);
+
         mPlaceListView = (ListView) findViewById(R.id.location_list);
-        GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
+        final GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
         mPlaceListView.setAdapter(mGeodataAdapter);
 
 
@@ -95,18 +84,13 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onClick(View v) {
                 //Show that the coords are being added
-                Context context = getApplicationContext();
-                CharSequence text = "The coordinates are: " + mLLToAdd;
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
                 Log.d("ADD_LOC", "You're adding location!");
 
                 //add coordinates to the bundle
                 coordinates.add(mLLToAdd);
                 if(mGeodata != null) {
                     mGeodataList.add(mGeodata);
+                    mGeodataAdapter.notifyDataSetChanged();
                 }
 
                 //add place to array list of places
@@ -142,6 +126,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         mListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Currently not being used, list is being displayed in the add location activity for now.
+                //TODO: Will need to make the array PARCELABLE if I want to save to bundle and pass to activity
+                //Need to consider sqitch to a SQL database, likely better scaleablility and cursor can handle more
                 Intent intent = new Intent(getApplicationContext(), GeoListActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("coordinates", coordinates);
@@ -215,8 +202,6 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
 
-            Toast.makeText(getApplicationContext(), "Clicked: " + primaryText,
-                    Toast.LENGTH_SHORT).show();
             Log.i(LOG_TAG, "Called getPlaceById to get Place details for " + placeId);
         }
     };
@@ -249,33 +234,12 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             mLat = (long) placeLatLng.latitude;
             mLong = (long) placeLatLng.longitude;
 
-            // Format details of the place for display and show it in a TextView.
-//            mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-//                    place.getId(), place.getAddress(), place.getPhoneNumber(),
-//                    place.getWebsiteUri()));
-
-            // Display the third party attributions if set.
-            final CharSequence thirdPartyAttribution = places.getAttributions();
-//            if (thirdPartyAttribution == null) {
-//                mPlaceDetailsAttribution.setVisibility(View.GONE);
-//            } else {
-//                mPlaceDetailsAttribution.setVisibility(View.VISIBLE);
-//                mPlaceDetailsAttribution.setText(Html.fromHtml(thirdPartyAttribution.toString()));
-//            }
-
             Log.i(LOG_TAG, "Place details received: " + place.getName());
 
             places.release();
         }
     };
 
-    private static Spanned formatPlaceDetails(Resources res, CharSequence name, String id,
-                                              CharSequence address, CharSequence phoneNumber, Uri websiteUri) {
-        Log.e("DETAILS", res.getString(R.string.place_details, name, id, address, phoneNumber,
-                websiteUri));
-        return Html.fromHtml(res.getString(R.string.place_details, name, id, address, phoneNumber,
-                websiteUri));
 
-    }
 
 }
