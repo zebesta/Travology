@@ -1,6 +1,9 @@
 package com.example.chrissebesta.travology;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +15,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.chrissebesta.travology.data.GeoContract;
+import com.example.chrissebesta.travology.data.GeoDbHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -53,6 +58,10 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     ArrayList<Place> mPlaces = new ArrayList<>();
     ArrayList<String> mPlaceNames = new ArrayList<>();
 
+    //SQL Variable
+
+    private ContentValues contentValues = new ContentValues();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +84,18 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         mLocationText.setOnItemClickListener(mAutocompleteClickListener);
 
         mPlaceListView = (ListView) findViewById(R.id.location_list);
-        final GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
-        mPlaceListView.setAdapter(mGeodataAdapter);
+        //Get listview information
+
+        //SQL listview population
+        SQLiteDatabase db = new GeoDbHelper(
+                getBaseContext()).getWritableDatabase();
+
+        Cursor todoCursor = db.rawQuery("SELECT  * FROM todo_items", null);
+        final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), todoCursor, 0);
+
+        //Non SQL listview population
+//        final GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
+//        mPlaceListView.setAdapter(sqlAdapter);
 
 
         mAddLocButton = (Button) findViewById(R.id.add_loc_button);
@@ -86,11 +105,20 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 //Show that the coords are being added
                 Log.d("ADD_LOC", "You're adding location!");
 
+                Log.d("CV", contentValues.toString());
+
+                //SQL list population and database insertion
+                db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
+                sqlAdapter.notifyDataSetChanged();
+                Log.d("DB", helper.getTableAsString(db, GeoContract.GeoEntry.TABLE_NAME));
+
+
                 //add coordinates to the bundle
                 coordinates.add(mLLToAdd);
                 if(mGeodata != null) {
                     mGeodataList.add(mGeodata);
-                    mGeodataAdapter.notifyDataSetChanged();
+                    //Non SQL listview update
+                    //mGeodataAdapter.notifyDataSetChanged();
                 }
 
                 //add place to array list of places
@@ -222,6 +250,17 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             }
             // Get the Place object from the buffer.
             final Place place = places.get(0);
+
+            //Clear all old content values and start with a clean slate before creating a new one
+            contentValues.clear();
+            //Add all the relevant values to the content values to be added to the SQL database later
+            contentValues.put(GeoContract.GeoEntry.COLUMN_PLACE_CODE, place.getId());
+            contentValues.put(GeoContract.GeoEntry.COLUMN_CITY_NAME, (String) place.getName());
+            contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY_CODE, "US");//TODO: Need to resolve the actual country code here
+            contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LAT, place.getLatLng().latitude);
+            contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LONG, place.getLatLng().longitude);
+            Log.d("CV", contentValues.toString());
+
 
             LatLng placeLatLng = place.getLatLng();
             //add Lat Long for clicked item to

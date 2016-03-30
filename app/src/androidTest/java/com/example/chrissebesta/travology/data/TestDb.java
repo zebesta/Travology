@@ -115,8 +115,8 @@ public class TestDb extends AndroidTestCase {
     */
     public void testGeoTable() {
         // First step: Get reference to writable database
-        SQLiteDatabase db = new GeoDbHelper(
-                mContext).getWritableDatabase();
+        GeoDbHelper dbHelper = new GeoDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 //        WeatherDbHelper dbHelper = new WeatherDbHelper(context);
 //        SQLiteDatabase db = dbHelper.getWritableDatabase();
 //        ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
@@ -173,7 +173,9 @@ public class TestDb extends AndroidTestCase {
 
         assertFalse("ERROR: There is more than one database entry", cursor.moveToNext());
 
+        String dbPrint = dbHelper.getTableAsString(db, GeoContract.GeoEntry.TABLE_NAME);
 
+        Log.d("TABLE", "The table is currently printing as: \n"+dbPrint);
         // Finally, close the cursor and database
         cursor.close();
         db.close();
@@ -269,6 +271,8 @@ public class TestDb extends AndroidTestCase {
         long rowId;
         String cityName;
         rowId = db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
+        String tableAsString = db.toString();
+        Log.d("TABLE", "The table is currently: \n"+tableAsString);
 
         return rowId;
     }

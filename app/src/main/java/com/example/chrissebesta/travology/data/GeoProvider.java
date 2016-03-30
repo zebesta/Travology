@@ -21,13 +21,24 @@ public class GeoProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        mOpenHelper = new GeoDbHelper(getContext());
         return false;
     }
 
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        Cursor retCursor;
+        retCursor = mOpenHelper.getReadableDatabase().query(
+                GeoContract.GeoEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        return retCursor;
     }
 
     @Nullable
