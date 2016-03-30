@@ -14,7 +14,7 @@ public class GeoProvider extends ContentProvider {
 
     private GeoDbHelper mOpenHelper;
 
-    //Need to set tables for DQL Query Builder (?)
+    //Need to set tables for SQL Query Builder (?)
     private static final SQLiteQueryBuilder sGeoQueryBuilder = new SQLiteQueryBuilder();
 
 
