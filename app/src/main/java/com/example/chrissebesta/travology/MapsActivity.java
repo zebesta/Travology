@@ -38,6 +38,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        
+
+        //get coordinate data from bundle placed in intent
         Intent intent = getIntent();
         mCoordinates = getIntent().getParcelableArrayListExtra("coordinates");
 

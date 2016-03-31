@@ -92,14 +92,15 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         Log.d("DB", "What is happening?: "+db);
 
         //TODO: DATABASE DOES NOT EXIST YET, NOT ABLE TO QUERY IT YET
-        Cursor geoCursor = db.rawQuery("SELECT  * FROM geo", null);
+        Cursor geoCursor = db.rawQuery("SELECT  * FROM " +GeoContract.GeoEntry.TABLE_NAME, null);
         final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), geoCursor, 0);
+
 
         //Non SQL listview population
 //        final GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
         mPlaceListView.setAdapter(sqlAdapter);
 
-
+        //geoCursor.close();
         mAddLocButton = (Button) findViewById(R.id.add_loc_button);
         mAddLocButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,9 +111,22 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 Log.d("CV", contentValues.toString());
 
                 //TODO: Prevent duplicate entries, place ID should be unique for each location added to the database
+                //String Query = "SELECT * FROM " + GeoContract.GeoEntry.TABLE_NAME + " WHERE " + GeoContract.GeoEntry.COLUMN_PLACE_CODE + " = " + contentValues.get(GeoContract.GeoEntry.COLUMN_PLACE_CODE).toString();
+                String Query = "SELECT * FROM geo WHERE "+GeoContract.GeoEntry.COLUMN_PLACE_CODE+" = '"+  contentValues.get(GeoContract.GeoEntry.COLUMN_PLACE_CODE).toString() +"'";
+                Log.d("QUERY", Query);
+                Cursor cursor = db.rawQuery(Query, null);
+                if(cursor.getCount() <= 0){
+                    db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
+                }else{
+                    Toast.makeText(AddLocationActivity.this, "Location is already added!", Toast.LENGTH_SHORT).show();
+                }
+                cursor.close();
                 //SQL list population and database insertion
-                db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
+                //db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
+                Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+                sqlAdapter.swapCursor(updatedCursor);
                 sqlAdapter.notifyDataSetChanged();
+                //updatedCursor.close();
                 Log.d("DB", helper.getTableAsString(db, GeoContract.GeoEntry.TABLE_NAME));
 
 
@@ -157,15 +171,13 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         mListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Currently not being used, list is being displayed in the add location activity for now.
-                //TODO: Will need to make the array PARCELABLE if I want to save to bundle and pass to activity
-                //Need to consider sqitch to a SQL database, likely better scaleablility and cursor can handle more
-                Intent intent = new Intent(getApplicationContext(), GeoListActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("coordinates", coordinates);
-                intent.putExtras(bundle);
+                //delete all rows from table
+                db.delete(GeoContract.GeoEntry.TABLE_NAME, null, null);
 
-                startActivity(intent);
+                //notify listview adapter of changes
+                Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+                sqlAdapter.swapCursor(updatedCursor);
+                sqlAdapter.notifyDataSetChanged();
             }
         });
 
