@@ -42,13 +42,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="ADD LOCATION" />
+            android:textSize="10sp"
+            android:text="+" />
 
         <Button
             android:id="@+id/geo_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
+            android:textSize="10sp"
             android:text="MAP" />
 
         <Button
@@ -56,6 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:textSize="10sp"
             android:text="@string/clear_text" />
 
         <Button
@@ -63,6 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:textSize="10sp"
             android:text="@string/List" />
     </LinearLayout>
 

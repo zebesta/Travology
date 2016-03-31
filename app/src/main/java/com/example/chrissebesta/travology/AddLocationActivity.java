@@ -154,15 +154,15 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             public void onClick(View v) {
 
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("coordinates", coordinates);
+                //Bundle bundle = new Bundle();
+                //bundle.putParcelableArrayList("coordinates", coordinates);
                 //bundle.putParcelableArrayList("places", places);
-                intent.putExtras(bundle);
-                Log.d(LOG_TAG, "first coordinate is: " + coordinates.get(0));
+                //intent.putExtras(bundle);
+                //Log.d(LOG_TAG, "first coordinate is: " + coordinates.get(0));
                 //Log.d(LOG_TAG, "The first place is: "+places.get(0).getName());
 
-                intent.putExtra(LAT_TAG, mLat);
-                intent.putExtra(LONG_TAG, mLong);
+                //intent.putExtra(LAT_TAG, mLat);
+               // intent.putExtra(LONG_TAG, mLong);
                 startActivity(intent);
             }
         });

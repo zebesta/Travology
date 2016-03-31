@@ -1,11 +1,14 @@
 package com.example.chrissebesta.travology;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
+import com.example.chrissebesta.travology.data.GeoContract;
+import com.example.chrissebesta.travology.data.GeoDbHelper;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,17 +41,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        
 
         //get coordinate data from bundle placed in intent
         Intent intent = getIntent();
-        mCoordinates = getIntent().getParcelableArrayListExtra("coordinates");
+        //mCoordinates = getIntent().getParcelableArrayListExtra("coordinates");
 
-        mLat = intent.getLongExtra(LAT_TAG, 0);
-        mLong = intent.getLongExtra(LONG_TAG, 0);
+        //mLat = intent.getLongExtra(LAT_TAG, 0);
+        //mLong = intent.getLongExtra(LONG_TAG, 0);
 
-        Log.d("EXTRA", "Got extras and they are: LAT: "+mLat+" LONG: "+mLong);
-        Log.d("EXTRA", "The array received has a size of: "+mCoordinates.size());
+        //Log.d("EXTRA", "Got extras and they are: LAT: " + mLat + " LONG: " + mLong);
+        //Log.d("EXTRA", "The array received has a size of: " + mCoordinates.size());
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -74,38 +76,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions()
-//                .position(sydney)
-//                .title("Marker in Sydney")
-//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps)));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//
-//
-//        // You can customize the marker image using images bundled with
-//        // your app, or dynamically generated bitmaps.
-//        mMap.addMarker(new MarkerOptions()
-//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-//                .title("Extra example marker")
-//                .position(new LatLng(-33.0685378, 151.441359)));
+        //Pull maps data from SQL database instead of from intent
+        final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
+        final SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+        cursor.moveToFirst();
 
-//        LatLng addedLocation = new LatLng(mLat, mLong);
-//        mMap.addMarker(new MarkerOptions()
-//                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-//                .title("TEST GEO Marker")
-//                .position(addedLocation));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(addedLocation));
-
-        int numberOfLocs = mCoordinates.size();
-        for (int i =0;i<numberOfLocs;i++){
+        //Cycle through the SQL database and pull the relevant data for each entry
+        for (int i = 0; i < cursor.getCount(); i++) {
+            String cityName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+            LatLng latLng = new LatLng(cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LAT)), cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LONG)));
             mMap.addMarker(new MarkerOptions()
                     //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-                    .title("Marker number: "+i)
-                    .position(mCoordinates.get(i)));
+                    .title(cityName)
+                    .position(latLng));
+            cursor.moveToNext();
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(mCoordinates.get(mCoordinates.size()-1)));
 
+
+        //Mapping information from coordinates passed via intent
+//        int numberOfLocs = mCoordinates.size();
+//        for (int i =0;i<numberOfLocs;i++){
+//            mMap.addMarker(new MarkerOptions()
+//                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+//                    .title("Marker number: "+i)
+//                    .position(mCoordinates.get(i)));
+//        }
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(mCoordinates.get(mCoordinates.size()-1)));
 
 
 //        Intent intent = getIntent();
