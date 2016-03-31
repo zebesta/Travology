@@ -87,15 +87,17 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         //Get listview information
 
         //SQL listview population
-        SQLiteDatabase db = new GeoDbHelper(
-                getBaseContext()).getWritableDatabase();
+        final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
+        final SQLiteDatabase db = helper.getWritableDatabase();
+        Log.d("DB", "What is happening?: "+db);
 
-        Cursor todoCursor = db.rawQuery("SELECT  * FROM todo_items", null);
-        final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), todoCursor, 0);
+        //TODO: DATABASE DOES NOT EXIST YET, NOT ABLE TO QUERY IT YET
+        Cursor geoCursor = db.rawQuery("SELECT  * FROM geo", null);
+        final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), geoCursor, 0);
 
         //Non SQL listview population
 //        final GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
-//        mPlaceListView.setAdapter(sqlAdapter);
+        mPlaceListView.setAdapter(sqlAdapter);
 
 
         mAddLocButton = (Button) findViewById(R.id.add_loc_button);
@@ -107,6 +109,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
                 Log.d("CV", contentValues.toString());
 
+                //TODO: Prevent duplicate entries, place ID should be unique for each location added to the database
                 //SQL list population and database insertion
                 db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
                 sqlAdapter.notifyDataSetChanged();
