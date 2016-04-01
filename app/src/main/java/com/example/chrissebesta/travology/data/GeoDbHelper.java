@@ -27,7 +27,7 @@ public class GeoDbHelper extends SQLiteOpenHelper {
                 GeoContract.GeoEntry._ID + " INTEGER PRIMARY KEY," +
                 GeoContract.GeoEntry.COLUMN_PLACE_CODE + " TEXT NOT NULL, " +
                 GeoContract.GeoEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
-                GeoContract.GeoEntry.COLUMN_COUNTRY_CODE + " TEXT NOT NULL, " +
+                GeoContract.GeoEntry.COLUMN_COUNTRY + " TEXT NOT NULL, " +
                 GeoContract.GeoEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
                 GeoContract.GeoEntry.COLUMN_COORD_LONG + " REAL NOT NULL"
                 + ");";

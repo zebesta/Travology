@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class AddLocationActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private Button mEnterButton;
@@ -91,13 +92,11 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         final SQLiteDatabase db = helper.getWritableDatabase();
         Log.d("DB", "What is happening?: "+db);
 
-        //TODO: DATABASE DOES NOT EXIST YET, NOT ABLE TO QUERY IT YET
         Cursor geoCursor = db.rawQuery("SELECT  * FROM " +GeoContract.GeoEntry.TABLE_NAME, null);
         final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), geoCursor, 0);
 
 
-        //Non SQL listview population
-//        final GeodataAdapter mGeodataAdapter = new GeodataAdapter(this, mGeodataList);
+
         mPlaceListView.setAdapter(sqlAdapter);
 
         //geoCursor.close();
@@ -126,26 +125,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
                 sqlAdapter.swapCursor(updatedCursor);
                 sqlAdapter.notifyDataSetChanged();
-                //updatedCursor.close();
-                Log.d("DB", helper.getTableAsString(db, GeoContract.GeoEntry.TABLE_NAME));
 
-
-                //add coordinates to the bundle
-                coordinates.add(mLLToAdd);
-                if(mGeodata != null) {
-                    mGeodataList.add(mGeodata);
-                    //Non SQL listview update
-                    //mGeodataAdapter.notifyDataSetChanged();
-                }
-
-                //add place to array list of places
-                mPlaces.add(mPlaceToAdd);
-                Log.d("PLACE", "There are " + mPlaces.size() + " items in the places array");
-                for(int j = 0; j<coordinates.size(); j++){
-//                    Place testPlace = mPlaces.get(j);
-//                    Log.d("PLACE", "The places in the list so far are: " + coordinates.get(j).toString());
-//                    Log.d("PLACE", "The places in the list so far are: " + mPlaceNames.get(j));
-                }
             }
         });
         mGeoButton = (Button) findViewById(R.id.geo_button);
@@ -266,12 +246,23 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             // Get the Place object from the buffer.
             final Place place = places.get(0);
 
+            //Tokenize the String by Commas, the last chunk will be the country
+            //TODO: THIS ASSUMES THAT THE COUNTRY IS ALWAYS THE LAST IN A SERIES OF COMMA DELIMITED STRINGS FOR THE ADDRESS
+            Log.d("LOCAL", "The address is: " + place.getAddress());
+            String address = place.getAddress().toString();
+            String country = "";
+            StringTokenizer st = new StringTokenizer(address, ", ");
+            while(st.hasMoreElements()){
+                country= st.nextToken();
+            }
+
+            Log.d("LOCAL", "The split address to country is: ." + country);
             //Clear all old content values and start with a clean slate before creating a new one
             contentValues.clear();
             //Add all the relevant values to the content values to be added to the SQL database later
             contentValues.put(GeoContract.GeoEntry.COLUMN_PLACE_CODE, place.getId());
             contentValues.put(GeoContract.GeoEntry.COLUMN_CITY_NAME, (String) place.getName());
-            contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY_CODE, "US");//TODO: Need to resolve the actual country code here
+            contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY, country);//TODO: Need to resolve the actual country code here
             contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LAT, place.getLatLng().latitude);
             contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LONG, place.getLatLng().longitude);
             Log.d("CV", contentValues.toString());

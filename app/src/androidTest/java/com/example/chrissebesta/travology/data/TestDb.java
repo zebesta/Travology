@@ -89,7 +89,7 @@ public class TestDb extends AndroidTestCase {
         geoColumnHasSet.add(GeoContract.GeoEntry._ID);
         geoColumnHasSet.add(GeoContract.GeoEntry.COLUMN_PLACE_CODE);
         geoColumnHasSet.add(GeoContract.GeoEntry.COLUMN_CITY_NAME);
-        geoColumnHasSet.add(GeoContract.GeoEntry.COLUMN_COUNTRY_CODE);
+        geoColumnHasSet.add(GeoContract.GeoEntry.COLUMN_COUNTRY);
         geoColumnHasSet.add(GeoContract.GeoEntry.COLUMN_COORD_LAT);
         geoColumnHasSet.add(GeoContract.GeoEntry.COLUMN_COORD_LONG);
 
@@ -132,7 +132,7 @@ public class TestDb extends AndroidTestCase {
         ContentValues contentValues = new ContentValues();
         contentValues.put(GeoContract.GeoEntry.COLUMN_PLACE_CODE, testPlaceKey);
         contentValues.put(GeoContract.GeoEntry.COLUMN_CITY_NAME, testCityName);
-        contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY_CODE, testCountryCode);
+        contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY, testCountryCode);
         contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LAT, testLatitude);
         contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LONG, testLongitude);
 
@@ -261,7 +261,7 @@ public class TestDb extends AndroidTestCase {
         ContentValues contentValues = new ContentValues();
         contentValues.put(GeoContract.GeoEntry.COLUMN_PLACE_CODE, testPlaceCode);
         contentValues.put(GeoContract.GeoEntry.COLUMN_CITY_NAME, testCityName);
-        contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY_CODE, testCountryCode);
+        contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY, testCountryCode);
         contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LAT, testLatitude);
         contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LONG, testLongitude);
 

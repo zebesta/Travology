@@ -85,34 +85,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Cycle through the SQL database and pull the relevant data for each entry
         for (int i = 0; i < cursor.getCount(); i++) {
             String cityName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+            String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
             LatLng latLng = new LatLng(cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LAT)), cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LONG)));
             mMap.addMarker(new MarkerOptions()
                     //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-                    .title(cityName)
+                    .title(cityName + ", " +countryName)
                     .position(latLng));
             cursor.moveToNext();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         }
 
-
-        //Mapping information from coordinates passed via intent
-//        int numberOfLocs = mCoordinates.size();
-//        for (int i =0;i<numberOfLocs;i++){
-//            mMap.addMarker(new MarkerOptions()
-//                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-//                    .title("Marker number: "+i)
-//                    .position(mCoordinates.get(i)));
-//        }
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(mCoordinates.get(mCoordinates.size()-1)));
-
-
-//        Intent intent = getIntent();
-//        mLat = intent.getLongExtra(LAT_TAG, 75);
-//        mLong = intent.getLongExtra(LONG_TAG, 75);
-//        mMap.addMarker(new MarkerOptions()
-//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-//                .title("Extra example marker")
-//                .position(new LatLng(mLat, mLong)));
+        cursor.close();
     }
 
     @Override
