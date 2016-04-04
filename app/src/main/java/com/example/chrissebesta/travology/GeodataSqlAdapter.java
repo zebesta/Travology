@@ -30,7 +30,8 @@ public class GeodataSqlAdapter extends CursorAdapter {
         TextView tvDetails = (TextView) view.findViewById(android.R.id.text2);
 
         // Extract properties from cursor
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_CITY_NAME)) + ", " +
+                cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COUNTRY));
 
         double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COORD_LAT));
         double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COORD_LAT));

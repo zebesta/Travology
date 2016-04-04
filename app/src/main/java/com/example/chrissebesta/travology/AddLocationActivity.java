@@ -38,8 +38,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     private PlaceAutocompleteAdapter mAdapter;
     protected GoogleApiClient mGoogleApiClient;
     private ListView mPlaceListView;
-    private Geodata mGeodata;
-    private ArrayList<Geodata> mGeodataList = new ArrayList<>();
+    SwipeDetector swipeDetector = new SwipeDetector();
 
     public final String LOG_TAG = this.getClass().getSimpleName();
 
@@ -109,23 +108,22 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
                 Log.d("CV", contentValues.toString());
 
-                //TODO: Prevent duplicate entries, place ID should be unique for each location added to the database
-                //String Query = "SELECT * FROM " + GeoContract.GeoEntry.TABLE_NAME + " WHERE " + GeoContract.GeoEntry.COLUMN_PLACE_CODE + " = " + contentValues.get(GeoContract.GeoEntry.COLUMN_PLACE_CODE).toString();
+                //Prevent duplicate entries, place ID should be unique for each location added to the database
                 String Query = "SELECT * FROM geo WHERE "+GeoContract.GeoEntry.COLUMN_PLACE_CODE+" = '"+  contentValues.get(GeoContract.GeoEntry.COLUMN_PLACE_CODE).toString() +"'";
                 Log.d("QUERY", Query);
                 Cursor cursor = db.rawQuery(Query, null);
                 if(cursor.getCount() <= 0){
+                    //if place is not already in the existing databse, add it
                     db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
                 }else{
                     Toast.makeText(AddLocationActivity.this, "Location is already added!", Toast.LENGTH_SHORT).show();
                 }
                 cursor.close();
-                //SQL list population and database insertion
-                //db.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
+
+                //update the list view with the new updated database
                 Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
                 sqlAdapter.swapCursor(updatedCursor);
                 sqlAdapter.notifyDataSetChanged();
-
             }
         });
         mGeoButton = (Button) findViewById(R.id.geo_button);
@@ -133,16 +131,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onClick(View v) {
 
+                //start Maps activity to display added cities to the user
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                //Bundle bundle = new Bundle();
-                //bundle.putParcelableArrayList("coordinates", coordinates);
-                //bundle.putParcelableArrayList("places", places);
-                //intent.putExtras(bundle);
-                //Log.d(LOG_TAG, "first coordinate is: " + coordinates.get(0));
-                //Log.d(LOG_TAG, "The first place is: "+places.get(0).getName());
-
-                //intent.putExtra(LAT_TAG, mLat);
-               // intent.putExtra(LONG_TAG, mLong);
                 startActivity(intent);
             }
         });
@@ -178,6 +168,24 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             }
         });
 
+        mPlaceListView.setOnTouchListener(swipeDetector);
+        mPlaceListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (swipeDetector.swipeDetected()) {
+                    Toast.makeText(getApplicationContext(),
+                            "You long clicked item in position: " + position + " With id: " + id,
+                            Toast.LENGTH_SHORT).show();
+
+                    db.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + id, null);
+                    Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+                    sqlAdapter.swapCursor(updatedCursor);
+                    sqlAdapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
 
@@ -192,6 +200,31 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 "Could not connect to Google API Client: Error " + connectionResult.getErrorCode(),
                 Toast.LENGTH_SHORT).show();
     }
+
+
+//    private ListView.OnItemClickListener mLocationClickListener
+//            = new ListView.OnItemClickListener() {
+//
+//        @Override
+//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//            if(swipeDetector.swipeDetected()){
+//                Toast.makeText(getApplicationContext(),
+//                        "You long clicked item in position: " + position + " With id: "+id,
+//                        Toast.LENGTH_SHORT).show();
+//                final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
+//                final SQLiteDatabase db = helper.getWritableDatabase();
+//                Cursor c = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+//                final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), c, 0);
+//
+//                db.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + id, null);
+//                Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+//                sqlAdapter.swapCursor(updatedCursor);
+//                sqlAdapter.notifyDataSetChanged();
+//            }
+//        }
+//    };
+
 
     /**
      * Listener that handles selections from suggestions from the AutoCompleteTextView that
@@ -256,7 +289,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 country= st.nextToken();
             }
 
-            Log.d("LOCAL", "The split address to country is: ." + country);
+            Log.d(LOG_TAG, "The split address to country is: ." + country);
             //Clear all old content values and start with a clean slate before creating a new one
             contentValues.clear();
             //Add all the relevant values to the content values to be added to the SQL database later
@@ -265,19 +298,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY, country);//TODO: Need to resolve the actual country code here
             contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LAT, place.getLatLng().latitude);
             contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LONG, place.getLatLng().longitude);
-            Log.d("CV", contentValues.toString());
-
-
-            LatLng placeLatLng = place.getLatLng();
-            //add Lat Long for clicked item to
-            mLLToAdd = placeLatLng;
-            mPlaceToAdd = place;
-            mGeodata = new Geodata((String) place.getName(), place.getLatLng());
-            mPlaceNames.add((String) place.getName());
-            String ll = placeLatLng.toString();
-            Log.d("LATLONG", "Lat and long are: " + ll);
-            mLat = (long) placeLatLng.latitude;
-            mLong = (long) placeLatLng.longitude;
+            Log.d(LOG_TAG, "The content values are: " + contentValues.toString());
 
             Log.i(LOG_TAG, "Place details received: " + place.getName());
 
