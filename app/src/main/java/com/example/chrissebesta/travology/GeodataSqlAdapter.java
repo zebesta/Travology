@@ -42,4 +42,10 @@ public class GeodataSqlAdapter extends CursorAdapter {
         tvDetails.setText(ll);
 
     }
+
+    //TODO: Handle adding view to each item in here? Need to be able to get ID/place in listView as well.
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        return super.getView(position, convertView, parent);
+    }
 }

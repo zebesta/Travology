@@ -178,23 +178,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //set ID location here and handle insite touch listener? Would need to reset touch listened when finger is lifted
-
                 mIdToDeleteOnSwipe = id;
-
-                //swipe detection without animation shown here
-                //if (swipeDetector.swipeDetected()) {
-                if (mSwipeDelete) {
-                    //reset swipe delete to false
-                    mSwipeDelete = false;
-                    Toast.makeText(getApplicationContext(),
-                            "You swiped item in position: " + position + " With id: " + id,
-                            Toast.LENGTH_SHORT).show();
-
-                    db.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + id, null);
-                    Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
-                    sqlAdapter.swapCursor(updatedCursor);
-                    sqlAdapter.notifyDataSetChanged();
-                }
             }
         });
 //      Old non animated touch listener
@@ -208,6 +192,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
             @Override
             public boolean onTouch(final View v, MotionEvent event) {
+                //TODO: Need to properly get ID of the selected object from the view here and use it for animation and delete..
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         if (mItemPressed) {
