@@ -4,6 +4,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.chrissebesta.travology.logger.Log;
+
 /**
  * Created by chrissebesta on 4/4/16.
  */
@@ -45,12 +47,14 @@ public class SwipeDetector implements View.OnTouchListener {
 
     public boolean onTouch(final View v, MotionEvent event) {
         boolean remove = false;
-        mListView = (ListView) v.getRootView().findViewById(R.id.add_location);
+        mListView = (ListView) v.getRootView().findViewById(R.id.location_list);
         mBackgroundContainer = (BackgroundContainer) v.getRootView().findViewById(R.id.listViewBackground);
 
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
+                Log.d("REMOVE123", "Down action!");
+
                 //new swipe handler with animation
                 if (mItemPressed) {
                     // Multi-item swipes not handled
@@ -69,6 +73,8 @@ public class SwipeDetector implements View.OnTouchListener {
 
             //swiping has stopped, pulled from new swipe with animation
             case MotionEvent.ACTION_CANCEL:
+                Log.d("REMOVE123", "Cancel action!");
+
                 v.setAlpha(1);
                 v.setTranslationX(0);
                 mItemPressed = false;
@@ -76,13 +82,14 @@ public class SwipeDetector implements View.OnTouchListener {
 
             case MotionEvent.ACTION_MOVE:
             {
+                Log.d("REMOVE123", "Move action!");
                 float x = event.getX() + v.getTranslationX();
                 float deltaX = x - mDownX;
                 float deltaXAbs = Math.abs(deltaX);
                 if (!mSwiping) {
                     if (deltaXAbs > mSwipeSlop) {
                         mSwiping = true;
-//                        mListView.requestDisallowInterceptTouchEvent(true);
+                        mListView.requestDisallowInterceptTouchEvent(true);
                         mBackgroundContainer.showBackground(v.getTop(), v.getHeight());
                     }
                 }
@@ -94,16 +101,20 @@ public class SwipeDetector implements View.OnTouchListener {
             break;
             case MotionEvent.ACTION_UP:
             {
+                Log.d("REMOVE123", "Up action!");
+
                 // User let go - figure out whether to animate the view out, or back into place
                 if (mSwiping) {
                     float x = event.getX() + v.getTranslationX();
+                    Log.d("REMOVE123", "The current x is: "+x);
                     float deltaX = x - mDownX;
+                    Log.d("REMOVE123", "The current delta x is: "+ deltaX);
                     float deltaXAbs = Math.abs(deltaX);
                     float fractionCovered;
                     float endX;
                     float endAlpha;
                     //final boolean remove;
-                    if (deltaXAbs > v.getWidth() / 4) {
+                    if (deltaXAbs > 100){//v.getWidth() / 4) {
                         // Greater than a quarter of the width - animate it out
                         fractionCovered = deltaXAbs / v.getWidth();
                         endX = deltaX < 0 ? -v.getWidth() : v.getWidth();
@@ -123,7 +134,7 @@ public class SwipeDetector implements View.OnTouchListener {
                     // back at an appropriate speed.
                     long duration = (int) ((1 - fractionCovered) * SWIPE_DURATION);
                     //Null reference?
-                    //mListView.setEnabled(false);
+                    mListView.setEnabled(false);
                     v.animate().setDuration(duration).
                             alpha(endAlpha).translationX(endX).
                             withEndAction(new Runnable() {
@@ -189,6 +200,7 @@ public class SwipeDetector implements View.OnTouchListener {
 //                return true;
 //            }
         }
+        Log.d("REMOVE123", "Im currently returning: "+remove);
         return remove;
 
     }

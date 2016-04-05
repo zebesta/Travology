@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -28,6 +29,7 @@ import com.google.android.gms.location.places.Places;
 
 import java.util.StringTokenizer;
 
+//TODO: Pull out the longer on click/on touch handlers and put them in their own classes to reduce clutter in this class
 public class AddLocationActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     //Autocomplete text field for place finding
     private AutoCompleteTextView mLocationText;
@@ -40,6 +42,15 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     //swipe detection for non-animated removal of view
     SwipeDetector swipeDetector = new SwipeDetector();
     BackgroundContainer mBackgroundContainer;
+
+    //swipe detection for animated removal of view
+    boolean mItemPressed = false;
+    boolean mSwiping = false;
+    boolean mSwipeDelete = false;
+    long mIdToDeleteOnSwipe = -1;
+    private static final int SWIPE_DURATION = 250;
+    private static final int MOVE_DURATION = 150;
+
 
 
     public final String LOG_TAG = this.getClass().getSimpleName();
@@ -159,16 +170,19 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 mLocationText.setText("");
             }
         });
-
-        mPlaceListView.setOnTouchListener(swipeDetector);
         mPlaceListView.setOnItemClickListener(new ListView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //set ID location here and handle insite touch listener? Would need to reset touch listened when finger is lifted
 
+                mIdToDeleteOnSwipe = id;
 
                 //swipe detection without animation shown here
-                if (swipeDetector.swipeDetected()) {
+                //if (swipeDetector.swipeDetected()) {
+                if (mSwipeDelete) {
+                    //reset swipe delete to false
+                    mSwipeDelete = false;
                     Toast.makeText(getApplicationContext(),
                             "You swiped item in position: " + position + " With id: " + id,
                             Toast.LENGTH_SHORT).show();
@@ -180,6 +194,112 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 }
             }
         });
+//      Old non animated touch listener
+        //mPlaceListView.setOnTouchListener(swipeDetector);
+        mPlaceListView.setOnTouchListener(new ListView.OnTouchListener() {
+            float mDownX;
+            private int mSwipeSlop = -1;
+
+            @Override
+            public boolean onTouch(final View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (mItemPressed) {
+                            // Multi-item swipes not handled
+                            return false;
+                        }
+                        mItemPressed = true;
+                        mDownX = event.getX();
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        v.setAlpha(1);
+                        v.setTranslationX(0);
+                        mItemPressed = false;
+                        break;
+                    case MotionEvent.ACTION_MOVE: {
+                        float x = event.getX() + v.getTranslationX();
+                        float deltaX = x - mDownX;
+                        float deltaXAbs = Math.abs(deltaX);
+                        if (!mSwiping) {
+                            if (deltaXAbs > mSwipeSlop) {
+                                mSwiping = true;
+                                mPlaceListView.requestDisallowInterceptTouchEvent(true);
+                                mBackgroundContainer.showBackground(v.getTop(), v.getHeight());
+                            }
+                        }
+                        if (mSwiping) {
+                            v.setTranslationX((x - mDownX));
+                            v.setAlpha(1 - deltaXAbs / v.getWidth());
+                        }
+                    }
+                    break;
+                    case MotionEvent.ACTION_UP: {
+                        // User let go - figure out whether to animate the view out, or back into place
+                        if (mSwiping) {
+                            float x = event.getX() + v.getTranslationX();
+                            float deltaX = x - mDownX;
+                            float deltaXAbs = Math.abs(deltaX);
+                            float fractionCovered;
+                            float endX;
+                            float endAlpha;
+                            final boolean remove;
+                            if (deltaXAbs > v.getWidth() / 4) {
+                                // Greater than a quarter of the width - animate it out
+                                fractionCovered = deltaXAbs / v.getWidth();
+                                endX = deltaX < 0 ? -v.getWidth() : v.getWidth();
+                                endAlpha = 0;
+                                remove = true;
+                            } else {
+                                // Not far enough - animate it back
+                                fractionCovered = 1 - (deltaXAbs / v.getWidth());
+                                endX = 0;
+                                endAlpha = 1;
+                                remove = false;
+                            }
+                            // Animate position and alpha of swiped item
+                            // NOTE: This is a simplified version of swipe behavior, for the
+                            // purposes of this demo about animation. A real version should use
+                            // velocity (via the VelocityTracker class) to send the item off or
+                            // back at an appropriate speed.
+                            long duration = (int) ((1 - fractionCovered) * SWIPE_DURATION);
+                            mPlaceListView.setEnabled(false);
+                            v.animate().setDuration(duration).
+                                    alpha(endAlpha).translationX(endX).
+                                    withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Restore animated values
+                                            v.setAlpha(1);
+                                            v.setTranslationX(0);
+                                            if (remove && mIdToDeleteOnSwipe != -1) {
+                                                //animateRemoval(mListView, v);
+
+                                                //Non animated removal from list:
+                                                //mSwipeDelete = true;
+                                                db.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + mIdToDeleteOnSwipe, null);//id, null);
+                                                Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+                                                sqlAdapter.swapCursor(updatedCursor);
+                                                sqlAdapter.notifyDataSetChanged();
+                                            } else {
+                                                mBackgroundContainer.hideBackground();
+                                                mSwiping = false;
+                                                mPlaceListView.setEnabled(true);
+                                            }
+                                            //reset id to -1 since item is no longer being observed
+                                            mIdToDeleteOnSwipe = -1;
+                                        }
+                                    });
+                        }
+                    }
+                    mItemPressed = false;
+                    break;
+                    default:
+                        return false;
+                }
+                return false;
+            }
+        });
+
     }
 
 
