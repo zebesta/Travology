@@ -40,7 +40,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     private ListView mPlaceListView;
 
     //swipe detection for non-animated removal of view
-    SwipeDetector swipeDetector = new SwipeDetector();
+    //SwipeDetector swipeDetector = new SwipeDetector();
     BackgroundContainer mBackgroundContainer;
 
     //swipe detection for animated removal of view
@@ -196,6 +196,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         });
 //      Old non animated touch listener
         //mPlaceListView.setOnTouchListener(swipeDetector);
+
+        //TODO: The ListViewRemovalAnimation attached the touch listener to each individual view item that is added
+        //need to do something similar here, can handle it in GeodataSqlAdapter
         mPlaceListView.setOnTouchListener(new ListView.OnTouchListener() {
             float mDownX;
             private int mSwipeSlop = -1;
@@ -296,6 +299,13 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                     default:
                         return false;
                 }
+                //TODO: Fixing block - fixing the animation back to normal since animationRemoval subroutine is not called during remove
+                //Start block for fixing animation
+                mBackgroundContainer.hideBackground();
+                //mSwiping = false;
+                mPlaceListView.setEnabled(true);
+                //End block of fixing
+
                 return false;
             }
         });
