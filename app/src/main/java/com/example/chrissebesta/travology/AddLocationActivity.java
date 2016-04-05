@@ -29,21 +29,27 @@ import com.google.android.gms.location.places.Places;
 import java.util.StringTokenizer;
 
 public class AddLocationActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+    //Autocomplete text field for place finding
     private AutoCompleteTextView mLocationText;
     private PlaceAutocompleteAdapter mAdapter;
     protected GoogleApiClient mGoogleApiClient;
+
+    //list view for locations added to SQL database
     private ListView mPlaceListView;
+
+    //swipe detection for non-animated removal of view
     SwipeDetector swipeDetector = new SwipeDetector();
+    BackgroundContainer mBackgroundContainer;
+
 
     public final String LOG_TAG = this.getClass().getSimpleName();
 
-
+    //Buttons
     private Button mGeoButton;
     private Button mAddLocButton;
     private Button mListButton;
 
-    //SQL Variable
-
+    //SQL Variables
     private ContentValues contentValues = new ContentValues();
 
 
@@ -67,7 +73,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
         mLocationText.setOnItemClickListener(mAutocompleteClickListener);
 
+        mBackgroundContainer = (BackgroundContainer) findViewById(R.id.listViewBackground);
         mPlaceListView = (ListView) findViewById(R.id.location_list);
+        android.util.Log.d("Debug", "d=" + mPlaceListView.getDivider());
         //Get listview information
 
         //SQL listview population
