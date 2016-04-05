@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.location.Address;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -26,14 +25,10 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class AddLocationActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-    private Button mEnterButton;
     private AutoCompleteTextView mLocationText;
     private PlaceAutocompleteAdapter mAdapter;
     protected GoogleApiClient mGoogleApiClient;
@@ -43,20 +38,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     public final String LOG_TAG = this.getClass().getSimpleName();
 
 
-    private List<Address> mAddresses;
     private Button mGeoButton;
     private Button mAddLocButton;
     private Button mListButton;
-    public final String LAT_TAG = "LAT TAG IT";
-    public final String LONG_TAG = "LONG TAG IT";
-    private LatLng mLLToAdd;
-    private Place mPlaceToAdd;
-    private long mLat;
-    private long mLong;
-    // Array list to store all added lat long coordinates
-    ArrayList<LatLng> coordinates = new ArrayList<>();
-    ArrayList<Place> mPlaces = new ArrayList<>();
-    ArrayList<String> mPlaceNames = new ArrayList<>();
 
     //SQL Variable
 
@@ -174,9 +158,11 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
+                //swipe detection without animation shown here
                 if (swipeDetector.swipeDetected()) {
                     Toast.makeText(getApplicationContext(),
-                            "You long clicked item in position: " + position + " With id: " + id,
+                            "You swiped item in position: " + position + " With id: " + id,
                             Toast.LENGTH_SHORT).show();
 
                     db.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + id, null);
@@ -200,30 +186,6 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 "Could not connect to Google API Client: Error " + connectionResult.getErrorCode(),
                 Toast.LENGTH_SHORT).show();
     }
-
-
-//    private ListView.OnItemClickListener mLocationClickListener
-//            = new ListView.OnItemClickListener() {
-//
-//        @Override
-//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//            if(swipeDetector.swipeDetected()){
-//                Toast.makeText(getApplicationContext(),
-//                        "You long clicked item in position: " + position + " With id: "+id,
-//                        Toast.LENGTH_SHORT).show();
-//                final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
-//                final SQLiteDatabase db = helper.getWritableDatabase();
-//                Cursor c = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
-//                final GeodataSqlAdapter sqlAdapter = new GeodataSqlAdapter(getBaseContext(), c, 0);
-//
-//                db.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + id, null);
-//                Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
-//                sqlAdapter.swapCursor(updatedCursor);
-//                sqlAdapter.notifyDataSetChanged();
-//            }
-//        }
-//    };
 
 
     /**
@@ -305,7 +267,4 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             places.release();
         }
     };
-
-
-
 }

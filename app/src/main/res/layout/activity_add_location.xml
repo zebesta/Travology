@@ -42,56 +42,63 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:textSize="10sp"
-            android:text="+" />
+            android:text="+"
+            android:textSize="10sp" />
 
         <Button
             android:id="@+id/geo_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:textSize="10sp"
-            android:text="MAP" />
+            android:text="MAP"
+            android:textSize="10sp" />
 
         <Button
             android:id="@+id/button_clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="10sp"
-            android:text="@string/clear_text" />
+            android:text="@string/clear_text"
+            android:textSize="10sp" />
 
         <Button
             android:id="@+id/button_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="10sp"
-            android:text="@string/List" />
+            android:text="@string/List"
+            android:textSize="10sp" />
     </LinearLayout>
 
 
-    <ListView
-        android:id="@+id/location_list"
+    <view
+        android:id="@+id/listViewBackground"
+        class="com.example.chrissebesta.travology.BackgroundContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/location_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
+    </view>
 
 
     <!--<TextView-->
-        <!--android:id="@+id/place_details"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:autoLink="all"-->
-        <!--android:text=""-->
-        <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
+    <!--android:id="@+id/place_details"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:autoLink="all"-->
+    <!--android:text=""-->
+    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
     <!--<TextView-->
-        <!--android:id="@+id/place_attribution"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:autoLink="all"-->
-        <!--android:text=""-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall" />-->
+    <!--android:id="@+id/place_attribution"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:autoLink="all"-->
+    <!--android:text=""-->
+    <!--android:textAppearance="?android:attr/textAppearanceSmall" />-->
 
 
 </LinearLayout>
