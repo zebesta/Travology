@@ -127,6 +127,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 Cursor updatedCursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
                 sqlAdapter.swapCursor(updatedCursor);
                 sqlAdapter.notifyDataSetChanged();
+
+                //clear text field after location is either added or attempted to be added
+                mLocationText.setText("");
             }
         });
         mGeoButton = (Button) findViewById(R.id.geo_button);
