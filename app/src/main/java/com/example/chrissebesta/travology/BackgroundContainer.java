@@ -21,6 +21,10 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+/*
+Added background behind the listview that contains the locations, will be used to show animations
+when a view is removed from the list
+ */
 
 public class BackgroundContainer extends FrameLayout {
 
