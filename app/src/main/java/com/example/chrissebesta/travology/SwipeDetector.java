@@ -48,7 +48,7 @@ public class SwipeDetector implements View.OnTouchListener {
     public boolean onTouch(final View v, MotionEvent event) {
         boolean remove = false;
         mListView = (ListView) v.getRootView().findViewById(R.id.location_list);
-        mBackgroundContainer = (BackgroundContainer) v.getRootView().findViewById(R.id.listViewBackground);
+        //mBackgroundContainer = (BackgroundContainer) v.getRootView().findViewById(R.id.listViewBackground);
 
 
         switch (event.getAction()) {

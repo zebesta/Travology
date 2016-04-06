@@ -71,17 +71,17 @@
     </LinearLayout>
 
 
-    <view
-        android:id="@+id/listViewBackground"
-        class="com.example.chrissebesta.travology.BackgroundContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<view-->
+    <!--android:id="@+id/listViewBackground"-->
+    <!--class="com.example.chrissebesta.travology.BackgroundContainer"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
 
-        <ListView
-            android:id="@+id/location_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>
-    </view>
+    <ListView
+        android:id="@+id/location_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+    <!--</view>-->
 
 
     <!--<TextView-->

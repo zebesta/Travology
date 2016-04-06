@@ -45,7 +45,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
     //swipe detection for non-animated removal of view
     //SwipeDetector swipeDetector = new SwipeDetector();
-    BackgroundContainer mBackgroundContainer;
+    //BackgroundContainer mBackgroundContainer;
 
     //swipe detection for animated removal of view
     boolean mItemPressed = false;
@@ -91,7 +91,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
         mLocationText.setOnItemClickListener(mAutocompleteClickListener);
 
-        mBackgroundContainer = (BackgroundContainer) findViewById(R.id.listViewBackground);
+        //mBackgroundContainer = (BackgroundContainer) findViewById(R.id.listViewBackground);
         mPlaceListView = (ListView) findViewById(R.id.location_list);
         android.util.Log.d("Debug", "d=" + mPlaceListView.getDivider());
         //Get listview information
@@ -142,7 +142,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                             if (deltaXAbs > mSwipeSlop) {
                                 mSwiping = true;
                                 mPlaceListView.requestDisallowInterceptTouchEvent(true);
-                                mBackgroundContainer.showBackground(v.getTop(), v.getHeight());
+                                //mBackgroundContainer.showBackground(v.getTop(), v.getHeight());
                             }
                         }
                         if (mSwiping) {
@@ -204,7 +204,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                                                 //sqlAdapter.swapCursor(updatedCursor);
                                                 //sqlAdapter.notifyDataSetChanged();
                                             } else {
-                                                mBackgroundContainer.hideBackground();
+                                                //mBackgroundContainer.hideBackground();
                                                 mSwiping = false;
                                                 mPlaceListView.setEnabled(true);
                                             }
@@ -212,6 +212,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                                             mIdToDeleteOnSwipe = -1;
                                         }
                                     });
+                            //mBackgroundContainer.hideBackground();
+
                         }
                     }
                     mItemPressed = false;
@@ -459,6 +461,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 observer.removeOnPreDrawListener(this);
                 boolean firstAnimation = true;
                 int firstVisiblePosition = listview.getFirstVisiblePosition();
+                int lastVisiblePosition = listview.getLastVisiblePosition();
                 for (int i = 0; i < listview.getChildCount(); ++i) {
                     final View child = listview.getChildAt(i);
                     int position = firstVisiblePosition + i;
@@ -473,7 +476,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                             if (firstAnimation) {
                                 child.animate().withEndAction(new Runnable() {
                                     public void run() {
-                                        mBackgroundContainer.hideBackground();
+                                        //mBackgroundContainer.hideBackground();
                                         mSwiping = false;
                                         mPlaceListView.setEnabled(true);
                                     }
@@ -493,7 +496,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                         if (firstAnimation) {
                             child.animate().withEndAction(new Runnable() {
                                 public void run() {
-                                    mBackgroundContainer.hideBackground();
+                                    //mBackgroundContainer.hideBackground();
                                     mSwiping = false;
                                     mPlaceListView.setEnabled(true);
                                 }
