@@ -14,13 +14,20 @@ import com.example.chrissebesta.travology.data.GeoContract;
  * Created by chrissebesta on 3/30/16.
  */
 public class GeodataSqlAdapter extends CursorAdapter {
-    public GeodataSqlAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
-    }
 
+    View.OnTouchListener mTouchListener;
+
+    public GeodataSqlAdapter(Context context, Cursor c, int flags, View.OnTouchListener listener) {
+        super(context, c, flags);
+        mTouchListener = listener;
+    }
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
+        View view = LayoutInflater.from(context).inflate(android.R.layout.simple_expandable_list_item_2,parent,false);
+        //set on touch listener here so that each item from the cursor adapter has an animated touch listener
+        view.setOnTouchListener(mTouchListener);
+
+        return view;
     }
 
     @Override
