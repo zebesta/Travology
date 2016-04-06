@@ -135,7 +135,6 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                         mItemPressed = false;
                         break;
                     case MotionEvent.ACTION_MOVE: {
-                        Log.d("TOUCH", "Action move event! Happening for view with id: "+v.getId());
                         float x = event.getX() + v.getTranslationX();
                         float deltaX = x - mDownX;
                         float deltaXAbs = Math.abs(deltaX);
@@ -154,6 +153,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                     break;
                     case MotionEvent.ACTION_UP: {
                         Log.d("TOUCH", "Action up event! Happening for view with id: "+v.getId());
+                        Log.d("TOUCH", "Action up event! Happening for view with mSwiping: "+mSwiping);
+
                         // User let go - figure out whether to animate the view out, or back into place
                         if (mSwiping) {
                             float x = event.getX() + v.getTranslationX();
@@ -191,7 +192,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                                             // Restore animated values
                                             v.setAlpha(1);
                                             v.setTranslationX(0);
-                                            if (remove && mIdToDeleteOnSwipe != -1) {
+                                            if (remove) {
+                                                Log.d("TOUCH", "Remove event being initialized");
+
                                                 animateRemoval(mPlaceListView, v);
 
                                                 //Non animated removal from list:
@@ -426,6 +429,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
      * layout, and then to run animations between all of those start/end positions.
      */
     private void animateRemoval(final ListView listview, View viewToRemove) {
+        Log.d("TOUCH", "Entering the animateRemoval subroutine");
+
         int firstVisiblePosition = listview.getFirstVisiblePosition();
         for (int i = 0; i < listview.getChildCount(); ++i) {
             View child = listview.getChildAt(i);
@@ -437,8 +442,12 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         }
         // Delete the item from the adapter
         int viewId = viewToRemove.getId();
-        Log.d("TOUCH", "The view id for the view trying to be removed is: "+ viewId);
-        mDb.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry._ID + "=" + viewId, null);//id, null);
+        Log.d("TOUCH", "The view id for the view trying to be removed is: " + viewId);
+        TextView tv = (TextView) viewToRemove.findViewById(android.R.id.text1);
+        //Remove based on matching city name
+        //TODO: NEED TO FIX THIS TO USE ACTUAL UNIQUE PLACE IDs
+        CharSequence cityName = tv.getText();
+        mDb.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry.COLUMN_CITY_NAME + "='" + cityName+"'", null);//id, null);
         Cursor updatedCursor = mDb.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
         mSqlAdapter.swapCursor(updatedCursor);
         mSqlAdapter.notifyDataSetChanged();
