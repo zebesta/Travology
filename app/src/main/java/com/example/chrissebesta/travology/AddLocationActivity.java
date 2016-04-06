@@ -60,6 +60,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
 
 
     public final String LOG_TAG = this.getClass().getSimpleName();
+    public final String ALPHA_SORT_QUERY = "SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME+ " ORDER BY "+ GeoContract.GeoEntry.COLUMN_COUNTRY + " ASC, " + GeoContract.GeoEntry.COLUMN_CITY_NAME + " ASC";
 
     //Buttons
     private Button mGeoButton;
@@ -98,9 +99,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         //SQL listview population
         final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
         mDb = helper.getWritableDatabase();
-        Log.d("DB", "What is happening?: " + mDb);
 
-        Cursor geoCursor = mDb.rawQuery("SELECT  * FROM " +GeoContract.GeoEntry.TABLE_NAME, null);
+        Cursor geoCursor = mDb.rawQuery(ALPHA_SORT_QUERY, null);
 
         View.OnTouchListener mTouchListener = new ListView.OnTouchListener(){
             float mDownX;
@@ -241,9 +241,9 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 Log.d("CV", contentValues.toString());
 
                 //Prevent duplicate entries, place ID should be unique for each location added to the database
-                String Query = "SELECT * FROM geo WHERE "+GeoContract.GeoEntry.COLUMN_PLACE_CODE+" = '"+  contentValues.get(GeoContract.GeoEntry.COLUMN_PLACE_CODE).toString() +"'";
-                Log.d("QUERY", Query);
-                Cursor cursor = mDb.rawQuery(Query, null);
+                String queryForDuplicateLocation = "SELECT * FROM geo WHERE "+GeoContract.GeoEntry.COLUMN_PLACE_CODE+" = '"+  contentValues.get(GeoContract.GeoEntry.COLUMN_PLACE_CODE).toString() +"'";
+                Log.d("QUERY", queryForDuplicateLocation);
+                Cursor cursor = mDb.rawQuery(queryForDuplicateLocation, null);
                 if(cursor.getCount() <= 0){
                     //if place is not already in the existing databse, add it
                     mDb.insert(GeoContract.GeoEntry.TABLE_NAME, null, contentValues);
@@ -253,7 +253,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 cursor.close();
 
                 //update the list view with the new updated database
-                Cursor updatedCursor = mDb.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+                Cursor updatedCursor = mDb.rawQuery(ALPHA_SORT_QUERY, null);
                 mSqlAdapter.swapCursor(updatedCursor);
                 mSqlAdapter.notifyDataSetChanged();
 
@@ -280,7 +280,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 mDb.delete(GeoContract.GeoEntry.TABLE_NAME, null, null);
 
                 //notify listview adapter of changes
-                Cursor updatedCursor = mDb.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+                Cursor updatedCursor = mDb.rawQuery(ALPHA_SORT_QUERY, null);
                 mSqlAdapter.swapCursor(updatedCursor);
                 mSqlAdapter.notifyDataSetChanged();
             }
@@ -427,8 +427,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         //Remove based on matching city name
         //TODO: NEED TO FIX THIS TO USE ACTUAL UNIQUE PLACE IDs, currently using city name (could double delete, IE, Potland, ME and Portland, OR
         CharSequence cityName = tv.getText();
-        mDb.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry.COLUMN_CITY_NAME + "='" + cityName+"'", null);//id, null);
-        Cursor updatedCursor = mDb.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+        mDb.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry.COLUMN_CITY_NAME + "='" + cityName + "'", null);//id, null);
+        Cursor updatedCursor = mDb.rawQuery(ALPHA_SORT_QUERY, null);
         mSqlAdapter.swapCursor(updatedCursor);
         mSqlAdapter.notifyDataSetChanged();
         //mSqlAdapter.remove(mSqlAdapter.getItem(position));
