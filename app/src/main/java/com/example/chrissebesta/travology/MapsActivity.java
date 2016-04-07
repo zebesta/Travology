@@ -1,11 +1,12 @@
 package com.example.chrissebesta.travology;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 
 import com.example.chrissebesta.travology.data.GeoContract;
 import com.example.chrissebesta.travology.data.GeoDbHelper;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    boolean cityMode = false;
+    boolean cityMode = true;
     private GeoJsonLayer geoJsonLayer;
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
@@ -47,17 +48,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        //get coordinate data from bundle placed in intent
-        Intent intent = getIntent();
-        //mCoordinates = getIntent().getParcelableArrayListExtra("coordinates");
-
-        //mLat = intent.getLongExtra(LAT_TAG, 0);
-        //mLong = intent.getLongExtra(LONG_TAG, 0);
-
-        //Log.d("EXTRA", "Got extras and they are: LAT: " + mLat + " LONG: " + mLong);
-        //Log.d("EXTRA", "The array received has a size of: " + mCoordinates.size());
+        //load layout
         setContentView(R.layout.activity_maps);
+
+        //load floating action button and allow it to be the boolean switch between city and country mode
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.mapFab);
+        fab.setImageResource(R.drawable.google_maps);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!cityMode) cityMode = true;
+                else cityMode = false;
+            }
+        });
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -80,7 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if(cityMode) {
+        if (cityMode) {
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
             //Pull maps data from SQL database instead of from intent
@@ -104,7 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             cursor.close();
-        }else{
+        } else {
             //map tupe for
             mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
             //read geoJson from raw resource file to draw world map
