@@ -23,29 +23,39 @@ public class GeodataSqlAdapter extends CursorAdapter {
     }
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(android.R.layout.simple_expandable_list_item_2,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.location_view_layout,parent,false);
         //set on touch listener here so that each item from the cursor adapter has an animated touch listener
         view.setOnTouchListener(mTouchListener);
+
 
         return view;
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View locationView, Context context, Cursor cursor) {
+        //Attach data to view with getter and setter methods
         // Find fields to populate in inflated template
-        TextView tvName = (TextView) view.findViewById(android.R.id.text1);
-        TextView tvDetails = (TextView) view.findViewById(android.R.id.text2);
+        TextView countryTextView = (TextView) locationView.findViewById(R.id.country_text_view);
+        TextView cityTextView = (TextView) locationView.findViewById(R.id.city_text_view);
+        TextView placeCode = (TextView) locationView.findViewById(R.id.place_code_text_view);
 
-        // Extract properties from cursor
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+        String country = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COUNTRY));
+        String city = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+        String address = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_ADDRESS));
+        String place = cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_PLACE_CODE));
 
-        double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COORD_LAT));
-        double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COORD_LAT));
-        // Populate fields with extracted properties
+        //Extract values from cursor and set member variables for the view so that the view contains all the information necessary
+        //locationView.setmPlaceCode(cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_PLACE_CODE)));
+        //locationView.setmCityName(city);
+        //locationView.setmCountryCode(country);
+        //locationView.setmLatitude(cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COORD_LAT)));
+        //locationView.setmLongitude(cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COORD_LONG)));
 
-        String ll = "Lat/Long is: "+latitude+" / "+longitude;
-        tvName.setText(name);
-        tvDetails.setText("Country: "+cursor.getString(cursor.getColumnIndexOrThrow(GeoContract.GeoEntry.COLUMN_COUNTRY))+ll);
+
+        //Set country and city, set the invisible place code to use for deleting from list
+        countryTextView.setText(country);
+        cityTextView.setText(address);
+        placeCode.setText(place);
 
     }
 

@@ -116,7 +116,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 //TODO: Need to properly get ID of the selected object from the view here and use it for animation and delete..
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        TextView tv = (TextView) v.findViewById(android.R.id.text1);
+                        TextView tv = (TextView) v.findViewById(R.id.city_text_view);
                         Log.d("TOUCH", "Action down event! Happening for view with id: "+v.getId());
                         Log.d("TOUCH", "Action down event! Happening for view with text: "+tv.getText());
                         if (mItemPressed) {
@@ -377,16 +377,22 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
             Log.d("LOCAL", "The address is: " + place.getAddress());
             String address = place.getAddress().toString();
             String country = "";
-            StringTokenizer st = new StringTokenizer(address, ", ");
+            StringTokenizer st = new StringTokenizer(address, ",");
             while(st.hasMoreElements()){
                 country= st.nextToken();
             }
+            Log.d("TRIM", "The string before trim is:"+country);
+            //trim white space before and after country name
+            country = country.trim();
+            Log.d("TRIM", "The string after trim is:" + country);
+
 
             Log.d(LOG_TAG, "The split address to country is: ." + country);
             //Clear all old content values and start with a clean slate before creating a new one
             contentValues.clear();
             //Add all the relevant values to the content values to be added to the SQL database later
             contentValues.put(GeoContract.GeoEntry.COLUMN_PLACE_CODE, place.getId());
+            contentValues.put(GeoContract.GeoEntry.COLUMN_ADDRESS, address);
             contentValues.put(GeoContract.GeoEntry.COLUMN_CITY_NAME, (String) place.getName());
             contentValues.put(GeoContract.GeoEntry.COLUMN_COUNTRY, country);//TODO: Need to resolve the actual country code here
             contentValues.put(GeoContract.GeoEntry.COLUMN_COORD_LAT, place.getLatLng().latitude);
@@ -423,11 +429,11 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
         // Delete the item from the adapter
         int viewId = viewToRemove.getId();
         Log.d("TOUCH", "The view id for the view trying to be removed is: " + viewId);
-        TextView tv = (TextView) viewToRemove.findViewById(android.R.id.text1);
+        TextView tv = (TextView) viewToRemove.findViewById(R.id.place_code_text_view);
         //Remove based on matching city name
         //TODO: NEED TO FIX THIS TO USE ACTUAL UNIQUE PLACE IDs, currently using city name (could double delete, IE, Potland, ME and Portland, OR
-        CharSequence cityName = tv.getText();
-        mDb.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry.COLUMN_CITY_NAME + "='" + cityName + "'", null);//id, null);
+        CharSequence placeCode = tv.getText();
+        mDb.delete(GeoContract.GeoEntry.TABLE_NAME, GeoContract.GeoEntry.COLUMN_PLACE_CODE + "='" + placeCode + "'", null);//id, null);
         Cursor updatedCursor = mDb.rawQuery(ALPHA_SORT_QUERY, null);
         mSqlAdapter.swapCursor(updatedCursor);
         mSqlAdapter.notifyDataSetChanged();

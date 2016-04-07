@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:paddingTop="2dip"
+    android:paddingBottom="2dip"
+    android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
+    android:mode="twoLine"
+    tools:ignore="RtlCompat">
+
+    <TextView android:id="@+id/country_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dip"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:textAlignment="viewStart"
+        />
+
+    <TextView android:id="@+id/city_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/country_text_view"
+        android:layout_alignStart="@id/country_text_view"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAlignment="viewStart"
+        />
+    <TextView
+        android:id="@+id/place_code_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
+</TwoLineListItem>
