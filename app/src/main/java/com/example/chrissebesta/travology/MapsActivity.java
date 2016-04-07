@@ -18,12 +18,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.geojson.GeoJsonLayer;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    boolean cityMode = false;
+    private GeoJsonLayer geoJsonLayer;
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
     private double mLat;
@@ -74,29 +80,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        if(cityMode) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        //Pull maps data from SQL database instead of from intent
-        final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
-        final SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
-        cursor.moveToFirst();
+            //Pull maps data from SQL database instead of from intent
+            final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
+            final SQLiteDatabase db = helper.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+            cursor.moveToFirst();
 
-        //Cycle through the SQL database and pull the relevant data for each entry
-        for (int i = 0; i < cursor.getCount(); i++) {
-            String cityName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_CITY_NAME));
-            String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
-            LatLng latLng = new LatLng(cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LAT)), cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LONG)));
-            mMap.addMarker(new MarkerOptions()
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
-                    .title(cityName + ", " +countryName)
-                    .position(latLng));
-            cursor.moveToNext();
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            //Cycle through the SQL database and pull the relevant data for each entry
+            for (int i = 0; i < cursor.getCount(); i++) {
+                String cityName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+                String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
+                LatLng latLng = new LatLng(cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LAT)), cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LONG)));
+                mMap.addMarker(new MarkerOptions()
+                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+                        .title(cityName + ", " + countryName)
+                        .position(latLng));
+                cursor.moveToNext();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+
+
+            cursor.close();
+        }else{
+            //map tupe for
+            mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+            //read geoJson from raw resource file to draw world map
+            try {
+                geoJsonLayer = new GeoJsonLayer(mMap, R.raw.world_map_geojson, getBaseContext());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            geoJsonLayer.addLayerToMap();
+
         }
-
-
-        cursor.close();
     }
 
     @Override
