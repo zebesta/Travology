@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.chrissebesta.travology.data.GeoContract;
 import com.example.chrissebesta.travology.data.GeoDbHelper;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    //TODO: need to make this variable persist through creation and stop/recreate/whatever
     boolean cityMode = true;
     private GeoJsonLayer geoJsonLayer;
     public final String LAT_TAG = "LAT TAG IT";
@@ -51,20 +53,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //load layout
         setContentView(R.layout.activity_maps);
 
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
         //load floating action button and allow it to be the boolean switch between city and country mode
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.mapFab);
         fab.setImageResource(R.drawable.google_maps);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!cityMode) cityMode = true;
-                else cityMode = false;
+                String modeToast = "";
+                if (!cityMode){
+                    cityMode = true;
+                    modeToast = "City mode!";
+                }
+                else{
+                    cityMode = false;
+                    modeToast = "Country mode!";
+                }
+                Toast.makeText(MapsActivity.this, modeToast, Toast.LENGTH_SHORT).show();
+
+                //TODO: Need to throw away map activity and regenerate a new map here
             }
         });
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
