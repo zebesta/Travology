@@ -32,6 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     //TODO: need to make this variable persist through creation and stop/recreate/whatever
+    //Default to city mode if there hasnt been a previous decision made here
     boolean cityMode = true;
     private GeoJsonLayer geoJsonLayer;
     public final String CITY_MODE = "CityMode";
@@ -49,18 +50,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient client;
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        //Restore city mode
-        cityMode = savedInstanceState.getBoolean(CITY_MODE);
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null){
+            cityMode = savedInstanceState.getBoolean(CITY_MODE);
+        }
         Log.d("CITY", "The current cityMode value is: "+cityMode);
+
 
         //load layout
         setContentView(R.layout.activity_maps);
