@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,7 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     //TODO: need to make this variable persist through creation and stop/recreate/whatever
-    boolean cityMode = true;
+    boolean cityMode = false;
     private GeoJsonLayer geoJsonLayer;
     public final String LAT_TAG = "LAT TAG IT";
     public final String LONG_TAG = "LONG TAG IT";
@@ -84,7 +85,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -125,14 +125,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //map tupe for
             mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
             //read geoJson from raw resource file to draw world map
+            Log.d("GEO", "Starting to get the GeoJSON from raw file");
             try {
-                geoJsonLayer = new GeoJsonLayer(mMap, R.raw.world_map_geojson, getBaseContext());
+                geoJsonLayer = new GeoJsonLayer(mMap, R.raw.geo_json_less_fields, getBaseContext());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            Log.d("GEO", "Starting to add GeoJSON to map");
+
             geoJsonLayer.addLayerToMap();
+            Log.d("GEO", "Done adding GeoJSON to map");
+
+            //Pull maps data from SQL database instead of from intent
+            final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
+            final SQLiteDatabase db = helper.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+            cursor.moveToFirst();
+
+            //Cycle through the SQL database and pull the relevant data for each entry
+            for (int i = 0; i < cursor.getCount(); i++) {
+                String cityName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_CITY_NAME));
+                String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
+                LatLng latLng = new LatLng(cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LAT)), cursor.getDouble(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COORD_LONG)));
+                mMap.addMarker(new MarkerOptions()
+                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.google_maps))
+                        .title(cityName + ", " + countryName)
+                        .position(latLng));
+                cursor.moveToNext();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+
+
+            cursor.close();
+            //Build map using KML files
+//            try {
+//                Log.d("GEO", "Starting to get the KML from raw file");
+//                KmlLayer kmlMap = new KmlLayer(mMap, R.raw.world_map_kml_simplified, this);
+//                Log.d("GEO", "Done getting the KML from raw file, adding to map");
+//                //Iterable<KmlContainer> kmlContainer = kmlMap.getContainers();
+//                //String what = kmlContainer.toString();
+//                //Log.d("GEO", "What is: "+what);
+//                kmlMap.addLayerToMap();
+//                Log.d("GEO", "Done adding to map");
+//            } catch (XmlPullParserException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
         }
     }
