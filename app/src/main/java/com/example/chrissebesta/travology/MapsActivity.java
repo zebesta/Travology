@@ -1,5 +1,6 @@
 package com.example.chrissebesta.travology;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -23,7 +24,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.geojson.GeoJsonLayer;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,8 +85,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     modeToast = "Country mode!";
                 }
                 Toast.makeText(MapsActivity.this, modeToast, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), CountryWebView.class);
+                startActivity(intent);
+
                 //recreate activity so that the new city mode property can take effect
-                recreate();
+                //recreate();
             }
         });
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -138,9 +145,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //map tupe for
             mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
             //read geoJson from raw resource file to draw world map
+            Log.d("GEO", "Reading JSON?");
+
+            try {
+                JSONObject jsonObj = new JSONObject(String.valueOf(R.raw.geo_json_less_fields));
+                JSONArray jsonArr = jsonObj.getJSONArray("features");
+                JSONObject jsonCountry = jsonArr.getJSONObject(1);
+                Log.d("GEO", "Attempting to read this shit and reading: "+String.valueOf(jsonCountry));
+            } catch (JSONException e) {
+                Log.d("GEO", "Catch error");
+                e.printStackTrace();
+            }
+            Log.d("GEO", "Done reading JSON");
+
+
             Log.d("GEO", "Starting to get the GeoJSON from raw file");
             try {
                 geoJsonLayer = new GeoJsonLayer(mMap, R.raw.geo_json_less_fields, getBaseContext());
+                //GeoJsonFeature geoJsonFeature = new GeoJsonFeature()
                 //GeoJsonFeature geoFeature = new GeoJsonFeature();
                 //GeoJsonGeometryCollection geoCollection = new gGe
             } catch (IOException e) {
