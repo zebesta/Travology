@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Travology</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">Cities Visited</string>
     <string name="add_location">Add Location</string>
     <string name="autocomplete_hint">Enter city name</string>
     <!-- getString(String, Object...) does not support HTML tags directly, they need to be encoded first.
@@ -10,5 +10,6 @@
     <string name="clear_text">Clear</string>
     <string name="List">Empty list</string>
     <string name="title_activity_list">ListActivity</string>
+    <string name="title_activity_countries">Countries Visited</string>
 
 </resources>

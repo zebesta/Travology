@@ -1,5 +1,6 @@
 package com.example.chrissebesta.travology;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -35,7 +36,7 @@ public class CountryWebView extends AppCompatActivity {
         setContentView(R.layout.activity_country_web_view);
 
         //Floating action button to return to city View mode
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.countryFab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.countryFab);
         fab.setImageResource(R.drawable.google_maps);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +74,18 @@ public class CountryWebView extends AppCompatActivity {
         webView.setPadding(0,0,0,0);
         //getScale();
         webView.setInitialScale(getScale());
-        webView.setWebChromeClient(new WebChromeClient());
+        final Activity activity = this;
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                // Activities and WebViews measure progress with different scales.
+                // The progress meter will automatically disappear when we reach 100%
+                if (progress == 100){
+                    Log.d("BUILD", "Done loading web client");
+                    fab.setImageResource(R.drawable.common_ic_googleplayservices);
+                }
+            }
+        });
 
         //get access to SQL database to pull country names
         final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
@@ -92,18 +104,18 @@ public class CountryWebView extends AppCompatActivity {
             cursor.moveToNext();
             cursorCountryVisitCount.close();
         }
-        Log.d("BUILD", "Done building the build string for country view");
+        Log.d("BUILD", "Done building the build string for country view, starting to draw map");
 
 
         //draw map using google Geo Chart and javascript
         drawMap();
+        Log.d("BUILD", "Done drawing map");
         //Zoom out and display the entire image to the user.
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         //Close cursor that was loading SQL data.
         cursor.close();
-
 
     }
 
