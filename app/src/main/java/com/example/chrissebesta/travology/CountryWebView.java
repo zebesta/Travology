@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -50,6 +53,17 @@ public class CountryWebView extends AppCompatActivity {
         //webView.getSettings().setDisplayZoomControls(false);
         //webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
+
+        //allow for Caching, if caches content is available use that, geo chart usage does not change
+        //The only thing that changes are the countries to be highlighted, cached content can handle this.
+        webView.getSettings().setAppCachePath(getBaseContext().getCacheDir().toString());
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        webView.getSettings().setAppCacheEnabled(true);
+        if ( !isNetworkAvailable() ) { // loading offline
+            webView.getSettings().setCacheMode( WebSettings.LOAD_CACHE_ELSE_NETWORK );
+        }
+
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
             webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -70,7 +84,10 @@ public class CountryWebView extends AppCompatActivity {
         //Cycle through the SQL database and pull the country names for each entry and color them
         for (int i = 0; i < cursor.getCount(); i++) {
             String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
-            build.append("['" + countryName + "', 1],");
+            //find number of times that country was visited
+            Cursor cursorCountryVisitCount = db.rawQuery("SELECT * FROM " + GeoContract.GeoEntry.TABLE_NAME + " WHERE " + GeoContract.GeoEntry.COLUMN_COUNTRY +" = '"+countryName+"'", null);
+
+            build.append("['" + countryName + "', "+cursorCountryVisitCount.getCount()+"],");
             cursor.moveToNext();
         }
 
@@ -78,9 +95,9 @@ public class CountryWebView extends AppCompatActivity {
         //draw map using google Geo Chart and javascript
         drawMap();
         //Zoom out and display the entire image to the user.
-        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webView.getSettings().setLoadWithOverviewMode(true);
-
+        webView.getSettings().setUseWideViewPort(true);
         //Close cursor that was loading SQL data.
         cursor.close();
 
@@ -97,9 +114,9 @@ public class CountryWebView extends AppCompatActivity {
                     " function drawRegionsMap() {" +
                     "  var data = google.visualization.arrayToDataTable([" +
                     //Add countries that are dynamically loaded from the SQL database to the javascript command
-                    "['Country', 'Popularity']," + build +
+                    "['Country', 'Cities Visited']," + build +
                     "]);" +
-                    "var options = {colors: ['#FF0000', '#228d16'],legend: 'none'};" +
+                    "var options = {colors: ['#5ae24b', '#228d16'],legend: 'none'};" +
                     "var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));" +
                      "chart.draw(data, options);" +
 //                    "function resize () {" +
@@ -147,6 +164,13 @@ public class CountryWebView extends AppCompatActivity {
             val = val * 100d;
         }
         return val.intValue();
+    }
+
+    //Check if network is available
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService( CONNECTIVITY_SERVICE );
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }
