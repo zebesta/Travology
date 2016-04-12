@@ -81,6 +81,7 @@ public class CountryWebView extends AppCompatActivity {
         Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
         cursor.moveToFirst();
 
+        Log.d("BUILD", "Beginning to build the build string for country view");
         //Cycle through the SQL database and pull the country names for each entry and color them
         for (int i = 0; i < cursor.getCount(); i++) {
             String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
@@ -89,7 +90,9 @@ public class CountryWebView extends AppCompatActivity {
 
             build.append("['" + countryName + "', "+cursorCountryVisitCount.getCount()+"],");
             cursor.moveToNext();
+            cursorCountryVisitCount.close();
         }
+        Log.d("BUILD", "Done building the build string for country view");
 
 
         //draw map using google Geo Chart and javascript
