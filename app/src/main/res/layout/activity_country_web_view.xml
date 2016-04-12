@@ -8,10 +8,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <!--<ImageView android:id="@+id/imageLoading1"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:visibility="gone"-->
+            <!--android:src="@drawable/google_maps"-->
+            <!--/>-->
         <WebView
             android:id="@+id/webview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></WebView>
+            android:layout_height="match_parent"/>
+            <!--android:visibility="gone"-->
+            <!--/>-->
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/countryFab"

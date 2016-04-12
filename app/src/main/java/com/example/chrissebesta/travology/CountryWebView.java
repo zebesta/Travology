@@ -31,6 +31,7 @@ public class CountryWebView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_country_web_view);
 
+        //Floating action button to return to city View mode
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.countryFab);
         fab.setImageResource(R.drawable.google_maps);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -43,6 +44,19 @@ public class CountryWebView extends AppCompatActivity {
 
         webView = (WebView) findViewById(R.id.webview);
 
+        //enable required webview settings
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setBuiltInZoomControls(true);
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+
+
+        webView.setPadding(0,0,0,0);
+        webView.setInitialScale(getScale());
+        webView.setWebChromeClient(new WebChromeClient());
+
         //get access to SQL database to pull country names
         final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
         final SQLiteDatabase db = helper.getWritableDatabase();
@@ -52,52 +66,19 @@ public class CountryWebView extends AppCompatActivity {
         //Cycle through the SQL database and pull the country names for each entry and color them
         for (int i = 0; i < cursor.getCount(); i++) {
             String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
-            build.append("['" + countryName + "', 700],");
+            build.append("['" + countryName + "', 1],");
             cursor.moveToNext();
         }
 
 
+        //draw map using google Geo Chart and javascript
         drawMap();
-        cursor.close();
-
-//        webView.getSettings().setJavaScriptEnabled(true);
-//        webView.getSettings().setAllowFileAccess(true);
-//        webView.getSettings().setSupportZoom(false);
-//        webView.getSettings().setAppCacheEnabled(false);
-//        webView.getSettings().setAllowContentAccess(true);
-//        webView.getSettings().setCacheMode(webView.getSettings().LOAD_NO_CACHE);
-//        webView.setWebChromeClient(new WebChromeClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setBuiltInZoomControls(true);
+        //Zoom out and display the entire image to the user.
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
 
-
-        webView.setPadding(0,0,0,0);
-        webView.setInitialScale(getScale());
-
-        webView.setWebChromeClient(new WebChromeClient());
-
-//        //get access to SQL database to pull country names
-//        final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
-//        final SQLiteDatabase db = helper.getWritableDatabase();
-//        Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
-//        cursor.moveToFirst();
-//
-//        //Cycle through the SQL database and pull the country names for each entry and color them
-//        for (int i = 0; i < cursor.getCount(); i++) {
-//            String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
-//            build.append("['" + countryName + "', 700],");
-//            cursor.moveToNext();
-//        }
-//
-//
-//        drawMap();
-//        cursor.close();
+        //Close cursor that was loading SQL data.
+        cursor.close();
 
 
     }
@@ -111,9 +92,10 @@ public class CountryWebView extends AppCompatActivity {
                     "google.setOnLoadCallback(drawRegionsMap);" +
                     " function drawRegionsMap() {" +
                     "  var data = google.visualization.arrayToDataTable([" +
+                    //Add countries that are dynamically loaded from the SQL database to the javascript command
                     "['Country', 'Popularity']," + build +
                     "]);" +
-                    "var options = {colors: ['#CB96CE', '#871F7B']};" +
+                    "var options = {colors: ['#CB96CE', '#871F7B'],legend: 'none'};" +
                     "var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));" +
                      "chart.draw(data, options);" +
 //                    "function resize () {" +
@@ -127,9 +109,11 @@ public class CountryWebView extends AppCompatActivity {
                     "</script>" +
                     "</head>" +
                     "<body>" +
-                    //"<div id='" + "regions_div" + "' style='" + "width:"+width+"; height:"+height+";"+"'></div>" +
 
-                    "<div id='"+"regions_div"+"' style='"+"width:100%; height: 100%;"+"'></div>" +
+                    //Control size of image returned from Geo Charts here
+                    //"<div id='" + "regions_div" + "' style='" + "width:"+width+"; height:"+height+";"+"'></div>" +
+                    //"<div id='"+"regions_div"+"' style='"+"width:100%; height: 100%;"+"'></div>" +
+                    "<div id='"+"regions_div"+"' style='"+"width:"+width + "px; height:100%;"+"'></div>" +
                     "</body>" +
                     "</html>";
 
