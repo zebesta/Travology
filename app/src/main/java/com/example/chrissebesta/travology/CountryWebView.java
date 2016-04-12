@@ -46,6 +46,9 @@ public class CountryWebView extends AppCompatActivity {
 
         //enable required webview settings
         webView.getSettings().setJavaScriptEnabled(true);
+        //done show zoom controls, but allow pinch to zoom gesture
+        //webView.getSettings().setDisplayZoomControls(false);
+        //webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -54,6 +57,7 @@ public class CountryWebView extends AppCompatActivity {
 
 
         webView.setPadding(0,0,0,0);
+        //getScale();
         webView.setInitialScale(getScale());
         webView.setWebChromeClient(new WebChromeClient());
 
@@ -95,7 +99,7 @@ public class CountryWebView extends AppCompatActivity {
                     //Add countries that are dynamically loaded from the SQL database to the javascript command
                     "['Country', 'Popularity']," + build +
                     "]);" +
-                    "var options = {colors: ['#CB96CE', '#871F7B'],legend: 'none'};" +
+                    "var options = {colors: ['#FF0000', '#228d16'],legend: 'none'};" +
                     "var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));" +
                      "chart.draw(data, options);" +
 //                    "function resize () {" +
@@ -113,7 +117,7 @@ public class CountryWebView extends AppCompatActivity {
                     //Control size of image returned from Geo Charts here
                     //"<div id='" + "regions_div" + "' style='" + "width:"+width+"; height:"+height+";"+"'></div>" +
                     //"<div id='"+"regions_div"+"' style='"+"width:100%; height: 100%;"+"'></div>" +
-                    "<div id='"+"regions_div"+"' style='"+"width:"+width + "px; height:100%;"+"'></div>" +
+                    "<div id='"+"regions_div"+"' style='"+"width:"+width + "px; height:"+height+"px; '></div>" +
                     "</body>" +
                     "</html>";
 
@@ -132,9 +136,16 @@ public class CountryWebView extends AppCompatActivity {
         display.getSize(size);
         width = size.x;
         height = size.y;
-        Double val = new Double(width) / new Double(800);
-        val = val * 100d;
+        display.getRotation();
+        Double val = 0d;
 
+        if(width<height) {
+            val = new Double(width) / new Double(800);
+            val = val * 100d;
+        }else{
+            val = new Double(height) / new Double(800);
+            val = val * 100d;
+        }
         return val.intValue();
     }
 
