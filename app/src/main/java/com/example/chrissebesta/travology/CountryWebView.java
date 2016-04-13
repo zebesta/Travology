@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.chrissebesta.travology.data.GeoContract;
@@ -26,6 +27,8 @@ import com.example.chrissebesta.travology.data.GeoDbHelper;
 public class CountryWebView extends AppCompatActivity {
 
     WebView webView;
+    //ImageView loadingImage;
+    ProgressBar progressBar;
     StringBuilder build = new StringBuilder();
     int width;
     int height;
@@ -47,13 +50,17 @@ public class CountryWebView extends AppCompatActivity {
         });
 
         webView = (WebView) findViewById(R.id.webview);
+        //loadingImage = (ImageView) findViewById(R.id.imageLoading1);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
 
         //enable required webview settings
         webView.getSettings().setJavaScriptEnabled(true);
         //done show zoom controls, but allow pinch to zoom gesture
         //webView.getSettings().setDisplayZoomControls(false);
         //webView.getSettings().setSupportZoom(true);
-        webView.getSettings().setBuiltInZoomControls(true);
+//        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setBuiltInZoomControls(false);
 
         //allow for Caching, if caches content is available use that, geo chart usage does not change
         //The only thing that changes are the countries to be highlighted, cached content can handle this.
@@ -77,14 +84,24 @@ public class CountryWebView extends AppCompatActivity {
         final Activity activity = this;
 
         webView.setWebChromeClient(new WebChromeClient() {
+            @Override
             public void onProgressChanged(WebView view, int progress) {
                 // Activities and WebViews measure progress with different scales.
                 // The progress meter will automatically disappear when we reach 100%
+                if(progress < 100){
+                    Log.d("BUILD", "Loading....."+progress);
+                    //loadingImage.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
+                }
                 if (progress == 100){
                     Log.d("BUILD", "Done loading web client");
-                    fab.setImageResource(R.drawable.common_ic_googleplayservices);
+                    //fab.setImageResource(R.drawable.common_ic_googleplayservices);
+                    //loadingImage.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
+                    webView.setVisibility(View.VISIBLE);
                 }
             }
+
         });
 
         //get access to SQL database to pull country names
