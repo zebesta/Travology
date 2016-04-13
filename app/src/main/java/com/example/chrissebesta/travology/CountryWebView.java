@@ -57,10 +57,10 @@ public class CountryWebView extends AppCompatActivity {
         //enable required webview settings
         webView.getSettings().setJavaScriptEnabled(true);
         //done show zoom controls, but allow pinch to zoom gesture
-        //webView.getSettings().setDisplayZoomControls(false);
         //webView.getSettings().setSupportZoom(true);
-//        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setBuiltInZoomControls(false);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setDisplayZoomControls(false);
+
 
         //allow for Caching, if caches content is available use that, geo chart usage does not change
         //The only thing that changes are the countries to be highlighted, cached content can handle this.
@@ -88,7 +88,7 @@ public class CountryWebView extends AppCompatActivity {
             public void onProgressChanged(WebView view, int progress) {
                 // Activities and WebViews measure progress with different scales.
                 // The progress meter will automatically disappear when we reach 100%
-                if(progress < 100){
+                if (progress < 100){
                     Log.d("BUILD", "Loading....."+progress);
                     //loadingImage.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.VISIBLE);
