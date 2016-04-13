@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.chrissebesta.travology.data.GeoContract;
 import com.example.chrissebesta.travology.data.GeoDbHelper;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 public class CountryWebView extends AppCompatActivity {
 
@@ -32,6 +34,11 @@ public class CountryWebView extends AppCompatActivity {
     StringBuilder build = new StringBuilder();
     int width;
     int height;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +75,8 @@ public class CountryWebView extends AppCompatActivity {
         webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.getSettings().setAppCacheEnabled(true);
-        if ( !isNetworkAvailable() ) { // loading offline
-            webView.getSettings().setCacheMode( WebSettings.LOAD_CACHE_ELSE_NETWORK );
+        if (!isNetworkAvailable()) { // loading offline
+            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
 
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -78,11 +85,52 @@ public class CountryWebView extends AppCompatActivity {
         }
 
 
-        webView.setPadding(0,0,0,0);
+        webView.setPadding(0, 0, 0, 0);
         //getScale();
         webView.setInitialScale(getScale());
         final Activity activity = this;
 
+
+//WebViewclient instead of Chrome
+//        webView.setWebViewClient(new WebViewClient() {
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                view.loadUrl(url);
+//                return false;
+//            }
+//
+//            @Override
+//            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+//                super.onPageStarted(view, url, favicon);
+//                Log.d("WEBCLIENT", "onPageStarted");
+//                progressBar.setVisibility(View.VISIBLE);
+//
+//                //progressDialog.show();
+//            }
+//
+//            @Override
+//            public void onPageFinished(WebView view, String url) {
+//                super.onPageFinished(view, url);
+//                Log.d("WEBCLIENT", "onPageFinished");
+//            }
+//
+//            @Override
+//            public void onLoadResource(WebView view, String url) {
+//                super.onLoadResource(view, url);
+//                Log.d("WEBCLIENT", "onLoadResource");
+//                if (webView.getProgress() == 100) {
+//                    //progressDialog.dismiss();
+//                    Log.d("WEBCLIENT", "onLoadResource 100%");
+//                    progressBar.setVisibility(View.INVISIBLE);
+//                    webView.setVisibility(View.VISIBLE);
+//
+//                }
+//            }
+//
+//
+//        });
+
+        //Chrome Client
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int progress) {
@@ -97,44 +145,78 @@ public class CountryWebView extends AppCompatActivity {
                     Log.d("BUILD", "Done loading web client");
                     //fab.setImageResource(R.drawable.common_ic_googleplayservices);
                     //loadingImage.setVisibility(View.INVISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    webView.setVisibility(View.VISIBLE);
+                    Handler handler = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            if ((webView != null)) {
+                                Log.d("BUILD", "Running the runner!");
+
+                                progressBar.setVisibility(View.INVISIBLE);
+                                webView.setVisibility(View.VISIBLE);
+                                // Draw the page into a bitmap
+                                //webView.draw();
+
+                                // After the bitmap is fully drawn, save the image
+                                //webView.saveImage();
+
+                                // Finish the helper activity
+                                //finish();
+                            }
+                        }
+                    };
+                    handler.postDelayed(runnable, 1000);
+
                 }
             }
 
         });
 
-        //get access to SQL database to pull country names
-        final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
-        final SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
-        cursor.moveToFirst();
+            //get access to SQL database to pull country names
+            final GeoDbHelper helper = new GeoDbHelper(getBaseContext());
+            final SQLiteDatabase db = helper.getWritableDatabase();
+            Cursor cursor = db.rawQuery("SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME, null);
+            cursor.moveToFirst();
 
-        Log.d("BUILD", "Beginning to build the build string for country view");
-        //Cycle through the SQL database and pull the country names for each entry and color them
-        for (int i = 0; i < cursor.getCount(); i++) {
-            String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
-            //find number of times that country was visited
-            Cursor cursorCountryVisitCount = db.rawQuery("SELECT * FROM " + GeoContract.GeoEntry.TABLE_NAME + " WHERE " + GeoContract.GeoEntry.COLUMN_COUNTRY +" = '"+countryName+"'", null);
+            Log.d("BUILD","Beginning to build the build string for country view");
+            //Cycle through the SQL database and pull the country names for each entry and color them
+            for(
+            int i = 0;
+            i<cursor.getCount();i++)
 
-            build.append("['" + countryName + "', "+cursorCountryVisitCount.getCount()+"],");
-            cursor.moveToNext();
-            cursorCountryVisitCount.close();
+            {
+                String countryName = cursor.getString(cursor.getColumnIndex(GeoContract.GeoEntry.COLUMN_COUNTRY));
+                //find number of times that country was visited
+                Cursor cursorCountryVisitCount = db.rawQuery("SELECT * FROM " + GeoContract.GeoEntry.TABLE_NAME + " WHERE " + GeoContract.GeoEntry.COLUMN_COUNTRY + " = '" + countryName + "'", null);
+
+                build.append("['" + countryName + "', " + cursorCountryVisitCount.getCount() + "],");
+                cursor.moveToNext();
+                cursorCountryVisitCount.close();
+            }
+
+            Log.d("BUILD","Done building the build string for country view, starting to draw map");
+
+
+            //draw map using google Geo Chart and javascript
+            drawMap();
+
+            Log.d("BUILD","Done drawing map");
+            //Zoom out and display the entire image to the user.
+            webView.getSettings().
+
+            setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+
+            webView.getSettings().
+
+            setLoadWithOverviewMode(true);
+
+            webView.getSettings().
+
+            setUseWideViewPort(true);
+            //Close cursor that was loading SQL data.
+            cursor.close();
+
         }
-        Log.d("BUILD", "Done building the build string for country view, starting to draw map");
-
-
-        //draw map using google Geo Chart and javascript
-        drawMap();
-        Log.d("BUILD", "Done drawing map");
-        //Zoom out and display the entire image to the user.
-        webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        //Close cursor that was loading SQL data.
-        cursor.close();
-
-    }
 
     void drawMap() {
         if (build.length() > 0) {
@@ -150,7 +232,7 @@ public class CountryWebView extends AppCompatActivity {
                     "]);" +
                     "var options = {colors: ['#5ae24b', '#228d16'],legend: 'none'};" +
                     "var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));" +
-                     "chart.draw(data, options);" +
+                    "chart.draw(data, options);" +
 //                    "function resize () {" +
 //                    "var chart = new google.visualization.LineChart(document.getElementById('chart_div'));" +
 //                    "chart.draw(data, options);" +
@@ -166,7 +248,7 @@ public class CountryWebView extends AppCompatActivity {
                     //Control size of image returned from Geo Charts here
                     //"<div id='" + "regions_div" + "' style='" + "width:"+width+"; height:"+height+";"+"'></div>" +
                     //"<div id='"+"regions_div"+"' style='"+"width:100%; height: 100%;"+"'></div>" +
-                    "<div id='"+"regions_div"+"' style='"+"width:"+width + "px; height:"+height+"px; '></div>" +
+                    "<div id='" + "regions_div" + "' style='" + "width:" + width + "px; height:" + height + "px; '></div>" +
                     "</body>" +
                     "</html>";
 
@@ -188,10 +270,10 @@ public class CountryWebView extends AppCompatActivity {
         display.getRotation();
         Double val = 0d;
 
-        if(width<height) {
+        if (width < height) {
             val = new Double(width) / new Double(800);
             val = val * 100d;
-        }else{
+        } else {
             val = new Double(height) / new Double(800);
             val = val * 100d;
         }
@@ -200,7 +282,7 @@ public class CountryWebView extends AppCompatActivity {
 
     //Check if network is available
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService( CONNECTIVITY_SERVICE );
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
