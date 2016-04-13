@@ -63,7 +63,7 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
     public final String ALPHA_SORT_QUERY = "SELECT  * FROM " + GeoContract.GeoEntry.TABLE_NAME+ " ORDER BY "+ GeoContract.GeoEntry.COLUMN_COUNTRY + " ASC, " + GeoContract.GeoEntry.COLUMN_CITY_NAME + " ASC";
 
     //Buttons
-    private Button mGeoButton;
+    private Button mMapsButton;
     private Button mAddLocButton;
     private Button mListButton;
 
@@ -261,8 +261,8 @@ public class AddLocationActivity extends AppCompatActivity implements GoogleApiC
                 mLocationText.setText("");
             }
         });
-        mGeoButton = (Button) findViewById(R.id.geo_button);
-        mGeoButton.setOnClickListener(new View.OnClickListener() {
+        mMapsButton = (Button) findViewById(R.id.geo_button);
+        mMapsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
