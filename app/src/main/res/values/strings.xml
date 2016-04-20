@@ -11,5 +11,6 @@
     <string name="List">Empty list</string>
     <string name="title_activity_list">ListActivity</string>
     <string name="title_activity_countries">Countries Visited</string>
+    <string name="title_activity_maps_activity_without_fragment">Map</string>
 
 </resources>
